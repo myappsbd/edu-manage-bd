@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduManage লগইন - স্টুডেন্ট পোর্টাল</title>
+    <meta name="theme-color" content="#1a73e8">
+    
+    <!-- Config -->
+    <script src="config.js"></script>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">  
+    
+    <style>
+        :root { 
+            --primary-color: #1a73e8; 
+            --secondary-color: #3b82f6; 
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; color: #1f2937; }
+        
+        /* 📱 স্ক্রিনশটের হুবহু লগইন ডিজাইন */
+        .login-wrapper { 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #ffffff; 
+            padding: 20px; 
+        }
+        .login-card { 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 20px 25px; 
+            background: #ffffff; 
+            border-radius: 16px; 
+        }
+        .login-title {
+            color: #1a73e8;
+            font-size: 1.85rem;
+            font-weight: 700;
+        }
+        .login-input-group {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .login-input-group:focus-within {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+        }
+        .login-input-group .input-group-text {
+            background-color: #fff;
+            border: none;
+            color: #1f2937;
+            padding-left: 15px;
+            font-size: 1.15rem;
+        }
+        .login-input-group .form-control {
+            border: none;
+            padding: 12px 14px;
+            font-size: 1.05rem;
+            box-shadow: none;
+        }
+        .login-btn {
+            background-color: #1a73e8;
+            border: none;
+            border-radius: 50px;
+            padding: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .login-btn:hover {
+            background-color: #1557b0;
+            transform: translateY(-1px);
+        }
+        .home-link {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .home-link:hover {
+            color: #1a73e8;
+        }
+
+        /* ড্যাশবোর্ড স্টাইল */
+        .student-header { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 25px 0; margin-bottom: 30px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .info-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100%; border-left: 5px solid var(--secondary-color); }
+        .status-box { padding: 15px; border-radius: 10px; text-align: center; color: white; font-weight: bold; }
+        .bg-paid { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; }
+        .bg-due { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+        .bg-warning { background: linear-gradient(135deg, #f7971e, #ffd200); color: #000; }
+        .live-badge-active { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 10px 0; display: none; justify-content: space-around; z-index: 1000; }
+        .nav-item-b { text-align: center; color: #666; font-size: 12px; cursor: pointer; padding: 5px 15px; border-radius: 8px; transition: all 0.3s; }
+        .nav-item-b:hover { background: #f0f0f0; }
+        .nav-item-b.active { color: var(--primary-color); font-weight: bold; }
+        .nav-item-b i { font-size: 20px; display: block; margin-bottom: 2px; }
+        
+        @media (min-width: 769px) { .nav-bottom { display: none !important; } }
+        @media (max-width: 768px) { body { padding-bottom: 70px; } }
+
+        .table-responsive-custom { max-height: 300px; overflow-y: auto; overflow-x: auto; }
+        .table-responsive-custom::-webkit-scrollbar { width: 4px; height: 4px; }
+        .table-responsive-custom::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .table-responsive-custom::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+        .alert-due { background: linear-gradient(135deg, #fff3cd, #ffe69c); border: none; border-left: 5px solid #ffc107; }
+        .btn-pay-now { background: linear-gradient(135deg, #dc3545, #c82333); border: none; color: white; font-weight: bold; padding: 8px 20px; border-radius: 30px; transition: all 0.3s; }
+        .btn-pay-now:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4); }
+        .att-summary-box { border-radius: 10px; padding: 15px; text-align: center; color: white; }
+        .att-summary-box .num { font-size: 1.6rem; font-weight: bold; }
+        .att-summary-box .lbl { font-size: 0.85rem; opacity: 0.9; }
+        .grade-badge { padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+
+        /* Calendar Styles */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; font-weight: bold; background: #f1f5f9; color: #475569; }
+        .calendar-day.present { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .calendar-day.absent { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .calendar-day.late { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .calendar-day.leave { background: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+        .calendar-day.empty { background: transparent; }
+        .calendar-header { font-weight: bold; text-align: center; color: #64748b; font-size: 0.8rem; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. STUDENT LOGIN SECTION (স্ক্রিনশটের হুবহু ডিজাইন) -->
+    <div id="loginSection" class="login-wrapper">
+        <div class="login-card">
+            <div class="text-center mb-3">
+                <img id="loginLogo" src="https://i.postimg.cc/vmTmfG7c/Edu-Manage-Academy-Logo.png" alt="Logo" style="height: 60px; margin-bottom: 12px;">
+                <h3 class="login-title mb-1" id="loginTitle">EduManage লগইন</h3>
+                <p class="text-secondary small">আপনার রেজিস্টার্ড তথ্য দিয়ে প্রবেশ করুন</p>
+            </div>
+            
+            <form id="loginForm">
+                <!-- মোবাইল নম্বর -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-dark mb-1">
+                        মোবাইল নম্বর <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group login-input-group">
+                        <span class="input-group-text"><i class="fas fa-phone-alt"></i></span>
+                        <input type="text" class="form-control" id="loginMobile" placeholder="01xxxxxxxxx" required>
+                    </div>
+                </div>
+
+                <!-- ৪-ডিজিটের পিন ফিল্ড -->
+                <div class="mb-3" id="pinFieldContainer">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-bold small text-dark mb-0">
+                            ৪-ডিজিটের পিন (PIN) <span class="text-danger">*</span>
+                        </label>
+                        <a href="javascript:void(0)" onclick="forgotPinAlert()" class="text-decoration-none small text-primary fw-bold">পিন ভুলে গেছেন?</a>
+                    </div>
+                    <div class="input-group login-input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <input type="password" class="form-control text-center font-monospace" id="loginPin" maxlength="4" placeholder="••••">
+                    </div>
+                    <div class="small text-muted mt-1" style="font-size: 0.82rem;">ডিফল্ট পিন: আপনার মোবাইল নম্বরের শেষ ৪ ডিজিট।</div>
+                </div>
+
+                <!-- লগইন বাটন -->
+                <button type="submit" class="btn btn-primary login-btn w-100 mt-2 text-white" id="loginBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i>লগইন করুন
+                </button>
+                
+                <!-- হোম পেজ লিংক -->
+                <div class="text-center mt-3 pt-1">
+                    <a href="index.html" class="home-link">
+                        <i class="fas fa-home me-1"></i>হোম পেজে ফিরে যান
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. STUDENT DASHBOARD -->
+    <div id="dashboardSection" style="display: none;">
+        
+        <!-- Header -->
+        <div class="student-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle me-3 overflow-hidden shadow-sm" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.9); flex-shrink: 0;">
+                        <img id="headerStudentPhoto" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <i class="fas fa-user fa-lg" id="headerUserIcon"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold" id="dashName">লোড হচ্ছে...</h5>
+                        <small class="opacity-75" id="dashBatch">...</small>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm rounded-pill">
+                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-md-inline">লগআউট</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- 📢 স্টুডেন্ট নোটিশ বক্স -->
+            <div id="studentNoticeBox" class="alert alert-warning border-0 shadow-sm mb-4" style="display: none;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-bullhorn fa-2x text-warning me-3"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1 text-dark" id="studentNoticeTitle">নোটিশ</h6>
+                        <p class="small mb-0 text-muted" id="studentNoticeDesc"></p>
+                    </div>
+                    <a id="studentNoticeFileBtn" href="#" target="_blank" class="btn btn-sm btn-outline-danger ms-2" style="display: none;">
+                        <i class="fas fa-file-pdf me-1"></i>ফাইল
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Section -->
+            <div id="paymentAlert" class="alert alert-due shadow-sm border-0 mb-4" style="display: none;">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <i class="fas fa-exclamation-circle fa-2x text-danger me-2"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="alert-heading fw-bold mb-0">⚠️ ফি বকেয়া আছে!</h6>
+                        <small>অনুগ্রহ করে ১০ তারিখের মধ্যে চলতি মাসের ফি পরিশোধ করুন।</small>
+                    </div>
+                    <a href="index.html#monthly_fee" class="btn btn-pay-now btn-sm">
+                        <i class="fas fa-hand-holding-usd me-1"></i>পরিশোধ করুন
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-4">
+                    <div class="status-box bg-paid shadow-sm">
+                        <small><i class="fas fa-check-circle me-1"></i>সর্বশেষ পেমেন্ট</small>
+                        <h5 class="mb-0 mt-1" id="dashLastPaid">-</h5>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="status-box bg-due shadow-sm" id="dueBoxStatus">
+                        <small><i class="fas fa-info-circle me-1"></i>বর্তমান অবস্থা</small>
+                        <h5 class="mb-0 mt-1" id="dashCurrentStatus">যাচাই হচ্ছে...</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Progress -->
+            <div class="card border-0 shadow-sm p-3 mb-4">
+                <h6 class="text-primary fw-bold mb-3">
+                    <i class="fas fa-graduation-cap me-2"></i>কোর্সের অগ্রগতি (<span id="totalDurText">১২</span> মাস)
+                </h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted" id="completedMonthsText">পরিশোধিত/সম্পন্ন: ০ মাস</span>
+                    <span class="text-danger fw-bold small" id="remainingMonthsText">বাকি: ১২ মাস</span>
+                </div>
+                <div class="progress" style="height: 12px; border-radius: 10px;">
+                    <div id="dashboardCourseProgress" class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">০%</div>
+                </div>
+            </div>
+
+            <!-- Class Routine -->
+            <div class="card border-0 shadow-sm p-3 mb-4" id="routineCard" style="display: none;">
+                <h5 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-calendar-week me-2"></i>সাপ্তাহিক ক্লাস রুটিন
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 40%;">দিন</th>
+                                <th>সময়</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weeklyRoutineBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Attendance Calendar & Summary -->
+            <div class="card border-0 shadow-sm p-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-info mb-0">
+                        <i class="fas fa-user-check me-2"></i>আমার হাজিরা
+                    </h5>
+                    <button class="btn btn-sm btn-outline-info" onclick="toggleAttendanceDetail()">
+                        <i class="fas fa-list me-1"></i>বিস্তারিত
+                    </button>
+                </div>
+                <div id="attendanceSummary">
+                    <p class="text-muted text-center small mb-0">
+                        <i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে...
+                    </p>
+                </div>
+                <!-- ক্যালেন্ডার ভিউ -->
+                <div id="attendanceCalendar" class="mt-3" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="changeCalendarMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <h6 class="mb-0 fw-bold text-primary" id="calendarMonthYear">-</h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="changeCalendarMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid mb-2">
+                        <div class="calendar-header">শনি</div>
+                        <div class="calendar-header">রবি</div>
+                        <div class="calendar-header">সোম</div>
+                        <div class="calendar-header">মঙ্গল</div>
+                        <div class="calendar-header">বুধ</div>
+                        <div class="calendar-header">বৃহঃ</div>
+                        <div class="calendar-header">শুক্র</div>
+                    </div>
+                    <div class="calendar-grid" id="calendarDays"></div>
+                    <div class="d-flex justify-content-center gap-3 mt-3 small">
+                        <span><span class="d-inline-block rounded-circle bg-success" style="width: 10px; height: 10px;"></span> উপস্থিত</span>
+                        <span><span class="d-inline-block rounded-circle bg-danger" style="width: 10px; height: 10px;"></span> অনুপস্থিত</span>
+                        <span><span class="d-inline-block rounded-circle bg-warning" style="width: 10px; height: 10px;"></span> দেরি</span>
+                    </div>
+                </div>
+                <div id="attendanceDetail" style="display: none;" class="mt-3">
+                    <div class="table-responsive-custom">
+                        <table class="table table-sm table-striped mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>তারিখ</th>
+                                    <th>দিন</th>
+                                    <th>স্ট্যাটাস</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceDetailBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exam Results with Chart -->
+            <div class="card border-0 shadow-sm p-3 mb-4">
+                <h5 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-clipboard-list me-2"></i>আমার ফলাফল
+                </h5>
+                <div id="studentResultsList">
+                    <p class="text-muted text-center small mb-0">
+                        <i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Live Class -->
+            <div class="card border-0 shadow-sm p-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-danger mb-0">
+                        <i class="fas fa-video me-2"></i>লাইভ ক্লাস
+                    </h5>
+                    <span class="badge bg-secondary" id="liveStatusBadge">
+                        <i class="fas fa-circle text-white me-1" style="font-size: 8px;"></i>অফলাইন
+                    </span>
+                </div>
+                
+                <div id="classContent">
+                    <div class="text-center py-5 bg-light rounded" id="noClassMessage">
+                        <i class="fas fa-video-slash fa-4x text-muted mb-3"></i>
+                        <h6 class="text-muted">বর্তমানে কোনো ক্লাস চলছে না</h6>
+                        <p class="small text-muted">আপনার ব্যাচের জন্য ক্লাস শুরুর সময় অপেক্ষা করুন</p>
+                    </div>
+                    
+                    <div id="classEmbedContainer" style="display: none;">
+                        <div id="iframeWrapper" class="ratio ratio-16x9 bg-dark rounded mb-3">
+                            <iframe id="classIframe" src="" allowfullscreen allow="autoplay; encrypted-media" style="border: none;"></iframe>
+                        </div>
+
+                        <div id="directLinkCard" class="text-center py-4 bg-light rounded mb-3" style="display: none; border: 1px dashed var(--primary-color);">
+                            <div class="mb-3 text-primary">
+                                <i class="fas fa-laptop-house fa-3x"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">অনলাইন ক্লাস শুরু হয়েছে</h5>
+                            <p class="text-muted small px-3">Google Meet বা Zoom সরাসরি পেজে লোড হয় না। নিচের বাটনে ক্লিক করুন।</p>
+                            <a id="directClassBtn" href="#" target="_blank" class="btn btn-primary btn-lg px-4 py-2 fw-bold shadow-sm rounded-pill">
+                                <i class="fas fa-external-link-alt me-2"></i>সরাসরি ক্লাসে যোগ দিন
+                            </a>
+                        </div>
+                        
+                        <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="badge bg-success" id="platformBadge">
+                                    <i class="fas fa-video me-1"></i>Google Meet
+                                </span>
+                                <span class="badge bg-info ms-2" id="classTimeDisplay">১০:০০ AM</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-danger btn-sm" id="fullscreenBtn" onclick="openClassFullscreen()">
+                                    <i class="fas fa-expand me-1"></i>পূর্ণ স্ক্রিন
+                                </button>
+                                <button class="btn btn-outline-success btn-sm ms-1" onclick="copyClassLink()">
+                                    <i class="fas fa-copy me-1"></i>লিংক কপি
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 p-3 bg-light rounded d-flex justify-content-between align-items-center flex-wrap gap-2 border">
+                            <div>
+                                <span class="small fw-bold text-secondary me-2"><i class="fas fa-file-pdf me-1 text-danger"></i>ক্লাসের শিট:</span>
+                                <span id="sheetAction"><span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span></span>
+                            </div>
+                            <div>
+                                <span class="small fw-bold text-secondary me-2"><i class="fab fa-youtube me-1 text-danger"></i>রেকর্ডিং:</span>
+                                <span id="recordAction"><span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span></span>
+                            </div>
+                        </div>
+                        
+                        <div id="classDescription" class="mt-2 p-2 bg-light rounded small text-muted"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile & History -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
+                            <h6 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-id-card me-2"></i>ব্যক্তিগত তথ্য
+                            </h6>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-warning text-dark fw-bold" onclick="changeStudentPinModal()">
+                                    <i class="fas fa-key me-1"></i>পিন পরিবর্তন
+                                </button>
+                                <input type="file" id="studentPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('studentPhotoInput').click()">
+                                    <i class="fas fa-camera me-1"></i>ছবি
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="downloadIDCard()">
+                                    <i class="fas fa-download me-1"></i>আইডি কার্ড
+                                </button>
+                            </div>
+                        </div>
+                        <table class="table table-borderless table-sm mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 40%;">মোবাইল:</td>
+                                <td class="fw-bold text-end" id="pMobile">...</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">প্যাকেজ:</td>
+                                <td class="fw-bold text-end" id="pPackage">...</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">ভর্তি:</td>
+                                <td class="fw-bold text-end" id="pAdmission">...</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="info-card" style="border-left-color: #f09819;">
+                        <h6 class="text-warning text-dark fw-bold border-bottom pb-2 mb-3">
+                            <i class="fas fa-history me-2"></i>পেমেন্ট ইতিহাস
+                        </h6>
+                        <div class="table-responsive-custom">
+                            <table class="table table-striped table-hover small align-middle mb-0">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>মাস</th>
+                                        <th>তারিখ</th>
+                                        <th>টাকা</th>
+                                        <th>অবস্থা</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentHistoryBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 📚 ক্লাস লাইব্রেরি -->
+            <div class="card border-0 shadow-sm p-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-secondary mb-0">
+                        <i class="fas fa-book-open me-2"></i>ক্লাস লাইব্রেরি
+                    </h5>
+                    <span class="badge bg-primary" id="totalClassCount">০ টি ক্লাস</span>
+                </div>
+                <div class="alert alert-info small py-2 mb-3">
+                    <i class="fas fa-info-circle me-1"></i> এখানে আপনার ব্যাচের সব ক্লাসের শিট ও ভিডিও রেকর্ড পাবেন।
+                </div>
+                <div id="classLibraryList">
+                    <p class="text-muted text-center small mb-0">
+                        <i class="fas fa-spinner fa-spin me-2"></i>লোড হচ্ছে...
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="nav-bottom" id="mobileNavBar">
+        <div class="nav-item-b active" onclick="location.reload()">
+            <i class="fas fa-home"></i>ড্যাশবোর্ড
+        </div>
+        <div class="nav-item-b" onclick="location.href='index.html#monthly_fee'">
+            <i class="fas fa-hand-holding-usd"></i>ফি দিন
+        </div>
+        <div class="nav-item-b text-danger" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>লগআউট
+        </div>
+    </div>
+
+    <!-- Hidden ID Card Template -->
+    <div id="idCardTemplate" style="display: none; width: 3.375in; height: 2.125in; background: #fff; font-family: 'Hind Siliguri', sans-serif; box-sizing: border-box;">
+        <div style="border: 2px solid #1e3a8a; border-radius: 10px; height: 100%; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+            <div style="background: #1e3a8a; color: white; padding: 6px 10px; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 30px;">
+                <h6 style="margin: 0; font-size: 13px; font-weight: bold; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="idSiteName">প্রতিষ্ঠানের নাম</h6>
+            </div>
+            <div style="padding: 8px; display: flex; gap: 10px; flex: 1; align-items: center;">
+                <div style="flex: 0 0 60px;">
+                    <div style="width: 60px; height: 65px; border: 1px solid #cbd5e1; border-radius: 5px; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center;">
+                        <img id="idCardPhoto" src="" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <i class="fas fa-user text-muted" id="idPhotoPlaceholder" style="font-size: 28px;"></i>
+                    </div>
+                </div>
+                <div style="flex: 1; line-height: 1.4;">
+                    <h5 style="margin: 0 0 3px; font-size: 12px; color: #1e3a8a; font-weight: bold; line-height: 1.2;" id="idStudentName">শিক্ষার্থীর নাম</h5>
+                    <p style="margin: 0; font-size: 10px; color: #334155; line-height: 1.3;"><strong>আইডি:</strong> <span id="idStudentId">-</span></p>
+                    <p style="margin: 0; font-size: 10px; color: #334155; line-height: 1.3;"><strong>ব্যাচ:</strong> <span id="idBatch">-</span></p>
+                    <p style="margin: 0; font-size: 10px; color: #334155; line-height: 1.3;"><strong>মোবাইল:</strong> <span id="idMobile">-</span></p>
+                </div>
+            </div>
+            <div style="background: #f1f5f9; padding: 4px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <p style="margin: 0; font-size: 8px; color: #64748b;">ভর্তি: <span id="idAdmission">-</span> | এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, orderBy, onSnapshot, doc, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // ⚙️ config.js থেকে কনফিগ লোড হচ্ছে
+        const C = window.COACHING_CONFIG || {};
+        const firebaseConfig = C.firebaseConfig;
+
+        if (!firebaseConfig || !firebaseConfig.apiKey) {
+            console.error("ত্রুটি: config.js ফাইলে firebaseConfig পাওয়া যায়নি!");
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ============ DYNAMIC BRANDING ============
+        const loadDynamicBranding = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, 'settings', 'site'));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const newShortName = data.siteShortName || C.siteShortName || 'EduManage';
+                    const newLogo = data.logoUrl || C.logoUrl;
+
+                    const lt = document.getElementById('loginTitle');
+                    if (lt) lt.textContent = newShortName + ' লগইন';
+                    const ll = document.getElementById('loginLogo');
+                    if (ll && newLogo) ll.src = newLogo;
+                    document.title = newShortName + ' - স্টুডেন্ট পোর্টাল';
+                    
+                    const idSite = document.getElementById('idSiteName');
+                    if (idSite) idSite.textContent = data.siteName || C.siteName || 'কোচিং সেন্টার';
+                }
+            } catch (e) { console.log("Branding fetch skipped", e); }
+        };
+        document.addEventListener('DOMContentLoaded', loadDynamicBranding);
+
+        // ============ HELPERS ============
+        const bnMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+        const bnDays = ['শনিবার', 'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার'];
+        
+        function toBengaliNum(n) {
+            if (n === undefined || n === null) return "০";
+            return n.toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
+        }
+        
+        function getCurrentMonthName() {
+            const d = new Date();
+            return `${bnMonths[d.getMonth()]}-${toBengaliNum(d.getFullYear())}`;
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            try {
+                const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return d.toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch (e) { return '-'; }
+        }
+
+        function getDayName(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                const dayIdx = d.getDay();
+                const map = { 0: 'রবিবার', 1: 'সোমবার', 2: 'মঙ্গলবার', 3: 'বুধবার', 4: 'বৃহস্পতিবার', 5: 'শুক্রবার', 6: 'শনিবার' };
+                return map[dayIdx];
+            } catch (e) { return ''; }
+        }
+
+        function isPhoneMatch(db, input) {
+            if (!db || !input) return false;
+            const a = db.toString().replace(/\D/g, '');
+            const b = input.toString().replace(/\D/g, '');
+            if (!a || !b) return false;
+            if (a.length >= 10 && b.length >= 10) return a.slice(-10) === b.slice(-10);
+            return a === b;
+        }
+
+        // ============ GLOBAL STATE ============
+        let currentStudentId = null;
+        let currentStudentData = null;
+        let activeClassLink = '';
+        let allAttendanceRecords = [];
+        let calendarCurrentDate = new Date();
+        let examChartInstance = null;
+        let uploadedPhotoData = null;
+
+        // পিন সেটিংস চেক করা (কনফিগ অনুযায়ী)
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinContainer = document.getElementById('pinFieldContainer');
+            const pinInp = document.getElementById('loginPin');
+            if (C.enableStudentPin !== false) {
+                if (pinContainer) pinContainer.style.display = 'block';
+                if (pinInp) pinInp.required = true;
+            } else {
+                if (pinContainer) pinContainer.style.display = 'none';
+                if (pinInp) pinInp.required = false;
+            }
+        });
+
+        // পিন ভুলে গেলে হেল্প
+        window.forgotPinAlert = () => {
+            Swal.fire({
+                title: 'পিন ভুলে গেছেন?',
+                html: `
+                    <p class="text-muted small">আপনি যদি নিজস্ব পিন সেট না করে থাকেন, তবে <b>আপনার রেজিস্টার্ড মোবাইল নম্বরের শেষ ৪ ডিজিট</b> দিয়ে চেষ্টা করুন।</p>
+                    <p class="small text-danger fw-bold mb-0">সমস্যা সমাধান না হলে কোচিং অফিসে যোগাযোগ করে পিন রিসেট করে নিন।</p>
+                `,
+                icon: 'info',
+                confirmButtonText: 'ঠিক আছে',
+                confirmButtonColor: '#1a73e8'
+            });
+        };
+
+        // ============ AUTO LOGIN CHECK ============
+        const stored = localStorage.getItem('studentMobile');
+        if (stored) {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => loadDashboard(stored));
+            } else {
+                loadDashboard(stored);
+            }
+        }
+
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const mobileNavBar = document.getElementById('mobileNavBar');
+
+        // ============ LOGIN WITH PIN ============
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>যাচাই হচ্ছে...';
+            btn.disabled = true;
+
+            const mobile = document.getElementById('loginMobile').value.trim();
+            const inputPin = document.getElementById('loginPin')?.value.trim();
+
+            if (mobile.length < 6) {
+                Swal.fire('সতর্কতা', 'সঠিক মোবাইল নম্বর দিন', 'warning');
+                btn.innerHTML = orig;
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                let q = query(collection(db, "students"), where("mobileNumber", "==", mobile), where("status", "==", "approved"));
+                let snap = await getDocs(q);
+                let foundStudent = null;
+                let foundDocId = null;
+                
+                if (!snap.empty) {
+                    foundStudent = snap.docs[0].data();
+                    foundDocId = snap.docs[0].id;
+                } else {
+                    const allQ = query(collection(db, "students"), where("status", "==", "approved"));
+                    const allSnap = await getDocs(allQ);
+                    allSnap.forEach(d => {
+                        const s = d.data();
+                        if (isPhoneMatch(s.mobileNumber, mobile) || (s.whatsappNumber && isPhoneMatch(s.whatsappNumber, mobile))) {
+                            foundStudent = s;
+                            foundDocId = d.id;
+                        }
+                    });
+                }
+
+                if (foundStudent) {
+                    // 🔐 পিন ভেরিফিকেশন চেক
+                    if (C.enableStudentPin !== false) {
+                        const rawPhone = foundStudent.mobileNumber.replace(/\D/g, '');
+                        const validPin = (foundStudent.pin && foundStudent.pin.toString().trim() !== '') 
+                            ? foundStudent.pin.toString().trim() 
+                            : rawPhone.slice(-4);
+
+                        if (inputPin !== validPin) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ভুল পিন!',
+                                text: 'প্রদত্ত ৪-ডিজিটের পিনটি সঠিক নয়। (ডিফল্ট পিন: আপনার মোবাইল নম্বরের শেষ ৪ ডিজিট)'
+                            });
+                            btn.innerHTML = orig;
+                            btn.disabled = false;
+                            return;
+                        }
+                    }
+
+                    localStorage.setItem('studentMobile', foundStudent.mobileNumber);
+                    Swal.fire({ icon: 'success', title: 'স্বাগতম!', timer: 1500, showConfirmButton: false }).then(() => {
+                        loadDashboard(foundStudent.mobileNumber);
+                    });
+                } else {
+                    const pendingQ = query(collection(db, "students"), where("mobileNumber", "==", mobile));
+                    const pendingSnap = await getDocs(pendingQ);
+                    if (!pendingSnap.empty) {
+                        const d = pendingSnap.docs[0].data();
+                        if (d.status === 'pending') {
+                            Swal.fire('অপেক্ষমান', 'আপনার আবেদন এখনো অনুমোদনের অপেক্ষায় আছে। অ্যাডমিন অনুমোদন করলে লগইন করতে পারবেন।', 'info');
+                        } else {
+                            Swal.fire('দুঃখিত', 'আপনার আবেদন বাতিল হয়েছে। অফিসে যোগাযোগ করুন।', 'error');
+                        }
+                    } else {
+                        Swal.fire('দুঃখিত', 'এই নম্বরে কোনো অনুমোদিত শিক্ষার্থী পাওয়া যায়নি।', 'error');
+                    }
+                    btn.innerHTML = orig;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                Swal.fire('ত্রুটি', 'নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন।', 'error');
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        });
+
+        // ============ LOGOUT ============
+        window.logout = function() {
+            Swal.fire({
+                title: 'লগআউট করবেন?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'হ্যাঁ, লগআউট'
+            }).then(r => {
+                if (r.isConfirmed) {
+                    localStorage.removeItem('studentMobile');
+                    location.href = 'student.html';
+                }
+            });
+        };
+
+        // ============ CHANGE PIN ============
+       window.changeStudentPinModal = () => {
+    if (!auth.currentUser) return;
+
+    Swal.fire({
+        title: 'পিন পরিবর্তন করুন',
+        html: `
+            <div class="text-start">
+                <label class="small fw-bold mb-1">নতুন ৪-ডিজিটের পিন দিন</label>
+                <input type="password" id="swalNewPin" class="form-control text-center font-monospace mb-2" maxlength="4" placeholder="••••">
+                <label class="small fw-bold mb-1">পিনটি পুনরায় লিখুন</label>
+                <input type="password" id="swalConfirmPin" class="form-control text-center font-monospace" maxlength="4" placeholder="••••">
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'সেভ করুন',
+        confirmButtonColor: '#1a73e8',
+        preConfirm: () => {
+            const p1 = document.getElementById('swalNewPin').value.trim();
+            const p2 = document.getElementById('swalConfirmPin').value.trim();
+            if (p1.length !== 4 || isNaN(p1)) {
+                Swal.showValidationMessage('অবশ্যই ৪ সংখ্যার পিন দিতে হবে!');
+                return false;
+            }
+            if (p1 !== p2) {
+                Swal.showValidationMessage('উভয় পিন নম্বর মিলছে না!');
+                return false;
+            }
+            return p1;
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const newPin = result.value;
+            const newPassword = `pin_${newPin}`;
+
+            try {
+                // ১. ফায়ারবেস অথেনটিকেশনের পাসওয়ার্ড পরিবর্তন
+                await updatePassword(auth.currentUser, newPassword);
+
+                // ২. ফায়ারস্টোরে আপডেট
+                await updateDoc(doc(db, "students", auth.currentUser.uid), {
+                    pin: newPin
+                });
+
+                Swal.fire('সফল!', 'আপনার নতুন পিন সফলভাবে সংরক্ষিত হয়েছে।', 'success');
+            } catch (err) {
+                console.error(err);
+                if (err.code === 'auth/requires-recent-login') {
+                    Swal.fire('নিরাপত্তা জনিত কারণে লগআউট প্রয়োজন', 'দয়া করে পুনরায় লগইন করে পিন পরিবর্তন করুন।', 'warning');
+                    signOut(auth);
+                } else {
+                    Swal.fire('ত্রুটি', 'পিন পরিবর্তন করা সম্ভব হয়নি।', 'error');
+                }
+            }
+        }
+    });
+};
+        // ============ 🖼️ ছবি অটো-কম্প্রেশন ও ফায়ারস্টোরে সেভ ============
+        function compressStudentImage(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.handlePhotoUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Swal.fire('ভুল ফাইল', 'অনুগ্রহ করে শুধুমাত্র ছবি ফাইল নির্বাচন করুন!', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'ছবি প্রসেস হচ্ছে...',
+                text: 'অনুগ্রহ করে অপেক্ষা করুন',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const compressedPhoto = await compressStudentImage(file);
+                uploadedPhotoData = compressedPhoto;
+
+                const headerImg = document.getElementById('headerStudentPhoto');
+                const headerIcon = document.getElementById('headerUserIcon');
+                if (headerImg && headerIcon) {
+                    headerImg.src = compressedPhoto;
+                    headerImg.style.display = 'block';
+                    headerIcon.style.display = 'none';
+                }
+
+                if (currentStudentId) {
+                    await updateDoc(doc(db, "students", currentStudentId), {
+                        photoUrl: compressedPhoto
+                    });
+
+                    if (currentStudentData) {
+                        currentStudentData.photoUrl = compressedPhoto;
+                    }
+
+                    Swal.fire({ 
+                        icon: 'success', 
+                        title: 'প্রোফাইল ছবি সংরক্ষিত হয়েছে!', 
+                        text: 'এখন থেকে এই ছবিটি আপনার প্রোফাইল ও আইডি কার্ডে স্বয়ংক্রিয়ভাবে থাকবে।', 
+                        timer: 2000, 
+                        showConfirmButton: false 
+                    });
+                } else {
+                    Swal.close();
+                }
+            } catch (err) {
+                console.error("Photo Upload Error:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ছবি সংরক্ষণ ব্যর্থ!',
+                    text: err.message || 'ডাটাবেজে সংরক্ষণ করা সম্ভব হয়নি।'
+                });
+            }
+        };
+
+        // ============ LIVE CLASS ============
+        function loadStudentLiveClass(batchName) {
+            const embed = document.getElementById('classEmbedContainer');
+            const noClass = document.getElementById('noClassMessage');
+            const statusBadge = document.getElementById('liveStatusBadge');
+            const sheetAction = document.getElementById('sheetAction');
+            const recordAction = document.getElementById('recordAction');
+            
+            if (!batchName) return;
+            
+            const q = query(
+                collection(db, "live_classes"),
+                where("batch", "==", batchName),
+                where("isActive", "==", true),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+            
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    embed.style.display = 'none';
+                    noClass.style.display = 'block';
+                    if (statusBadge) {
+                        statusBadge.innerHTML = '<i class="fas fa-circle text-white me-1" style="font-size: 8px;"></i>অফলাইন';
+                        statusBadge.className = 'badge bg-secondary';
+                    }
+                    if (sheetAction) sheetAction.innerHTML = '<span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span>';
+                    if (recordAction) recordAction.innerHTML = '<span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span>';
+                    activeClassLink = '';
+                    return;
+                }
+                
+                const data = snapshot.docs[0].data();
+                activeClassLink = data.link;
+                
+                embed.style.display = 'block';
+                noClass.style.display = 'none';
+                
+                if (sheetAction) {
+                    if (data.classSheet && data.classSheet.trim() !== '') {
+                        sheetAction.innerHTML = `<a href="${data.classSheet}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3"><i class="fas fa-download me-1"></i>ডাউনলোড</a>`;
+                    } else {
+                        sheetAction.innerHTML = '<span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span>';
+                    }
+                }
+                if (recordAction) {
+                    if (data.classRecord && data.classRecord.trim() !== '') {
+                        recordAction.innerHTML = `<a href="${data.classRecord}" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3"><i class="fab fa-youtube me-1"></i>ভিডিও দেখুন</a>`;
+                    } else {
+                        recordAction.innerHTML = '<span class="badge bg-secondary rounded-pill">শীঘ্রই আসছে</span>';
+                    }
+                }
+                
+                if (statusBadge) {
+                    statusBadge.innerHTML = '<i class="fas fa-circle text-white me-1" style="font-size: 8px;"></i>লাইভ';
+                    statusBadge.className = 'badge bg-danger live-badge-active';
+                }
+                
+                const iframe = document.getElementById('classIframe');
+                const iframeWrapper = document.getElementById('iframeWrapper');
+                const directLinkCard = document.getElementById('directLinkCard');
+                const directBtn = document.getElementById('directClassBtn');
+                const fullscreenBtn = document.getElementById('fullscreenBtn');
+                const platformBadge = document.getElementById('platformBadge');
+                const timeDisplay = document.getElementById('classTimeDisplay');
+                const descDiv = document.getElementById('classDescription');
+                
+                const platformMap = {
+                    'google_meet': { icon: 'fab fa-google', label: 'Google Meet' },
+                    'zoom': { icon: 'fas fa-video', label: 'Zoom' },
+                    'youtube': { icon: 'fab fa-youtube', label: 'YouTube Live' },
+                    'custom': { icon: 'fas fa-link', label: 'কাস্টম' }
+                };
+                
+                const pd = platformMap[data.platform] || platformMap.custom;
+                platformBadge.innerHTML = `<i class="${pd.icon} me-1"></i>${pd.label}`;
+                
+                if (data.platform === 'youtube') {
+                    const vid = extractYouTubeId(data.link);
+                    iframe.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
+                    iframeWrapper.style.display = 'block';
+                    directLinkCard.style.display = 'none';
+                    if (fullscreenBtn) fullscreenBtn.style.display = 'inline-block';
+                } else {
+                    directBtn.href = data.link;
+                    iframe.src = "";
+                    iframeWrapper.style.display = 'none';
+                    directLinkCard.style.display = 'block';
+                    if (fullscreenBtn) fullscreenBtn.style.display = 'none';
+                }
+                
+                let timeText = '';
+                if (data.time) timeText += data.time;
+                if (data.date) timeText += ` (${data.date})`;
+                timeDisplay.textContent = timeText || 'সময় সেট করা হয়নি';
+                descDiv.textContent = data.description || 'কোনো বিশেষ নির্দেশনা নেই';
+            }, (err) => {
+                console.error('Live class error:', err);
+            });
+        }
+
+        function extractYouTubeId(url) {
+            try {
+                const u = new URL(url);
+                if (u.hostname.includes('youtube.com')) return new URLSearchParams(u.search).get('v') || u.pathname.split('/').pop();
+                if (u.hostname.includes('youtu.be')) return u.pathname.substring(1);
+                return url;
+            } catch (e) { return url; }
+        }
+
+        window.openClassFullscreen = function() {
+            const iframe = document.getElementById('classIframe');
+            if (iframe.requestFullscreen) iframe.requestFullscreen();
+            else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+        };
+
+        window.copyClassLink = function() {
+            if (!activeClassLink) return;
+            navigator.clipboard.writeText(activeClassLink).then(() => {
+                Swal.fire({ icon: 'success', title: 'কপি হয়েছে!', timer: 1500, showConfirmButton: false });
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = activeClassLink;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                Swal.fire('কপি হয়েছে!', '', 'success');
+            });
+        };
+
+        // ============ 📢 স্টুডেন্ট নোটিশ লোড ফাংশন (ফিক্সড) ============
+        async function loadStudentNotice(batchName) {
+            const noticeBox = document.getElementById('studentNoticeBox');
+            if (!noticeBox) return;
+
+            try {
+                const snap = await getDocs(collection(db, "notices"));
+                if (snap.empty) {
+                    noticeBox.style.display = 'none';
+                    return;
+                }
+
+                // নোটিশ ফিল্টার ও সর্ট
+                const validNotices = snap.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(n => n.target === 'all' || n.target === 'students' || n.target === `batch:${batchName}`)
+                    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+                if (validNotices.length > 0) {
+                    const n = validNotices[0];
+                    noticeBox.style.display = 'block';
+                    document.getElementById('studentNoticeTitle').textContent = n.title + (n.date ? ' (' + n.date + ')' : '');
+                    document.getElementById('studentNoticeDesc').textContent = n.description || '';
+                    
+                    const fBtn = document.getElementById('studentNoticeFileBtn');
+                    if (fBtn) {
+                        if (n.fileUrl) {
+                            fBtn.href = n.fileUrl;
+                            fBtn.style.display = 'inline-block';
+                        } else {
+                            fBtn.style.display = 'none';
+                        }
+                    }
+                } else {
+                    noticeBox.style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Notice Load Error:", err);
+                noticeBox.style.display = 'none';
+            }
+        }
+
+        // ============ LOAD DASHBOARD ============
+        async function loadDashboard(mobile) {
+            loginSection.style.display = 'none';
+            dashboardSection.style.display = 'block';
+            if (mobileNavBar) mobileNavBar.style.display = 'flex';
+
+            document.getElementById('dashName').innerText = 'লোড হচ্ছে...';
+            document.getElementById('dashBatch').innerText = '...';
+
+            try {
+                const q = query(
+                    collection(db, "students"),
+                    where("mobileNumber", "==", mobile),
+                    where("status", "==", "approved")
+                );
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    const allQ = query(collection(db, "students"), where("status", "==", "approved"));
+                    const allSnap = await getDocs(allQ);
+                    let found = null;
+                    allSnap.forEach(d => {
+                        const s = d.data();
+                        if (isPhoneMatch(s.mobileNumber, mobile) || (s.whatsappNumber && isPhoneMatch(s.whatsappNumber, mobile))) {
+                            found = { id: d.id, data: s };
+                        }
+                    });
+                    if (!found) {
+                        Swal.fire('ত্রুটি', 'শিক্ষার্থীর তথ্য পাওয়া যায়নি', 'error');
+                        logout();
+                        return;
+                    }
+                    currentStudentId = found.id;
+                    currentStudentData = found.data;
+                } else {
+                    const d = snap.docs[0];
+                    currentStudentId = d.id;
+                    currentStudentData = d.data();
+                }
+                
+                const student = currentStudentData;
+
+                document.getElementById('dashName').innerText = student.studentName || '-';
+                document.getElementById('dashBatch').innerText = student.batch || '-';
+                
+                document.getElementById('pMobile').innerText = student.mobileNumber || '-';
+                document.getElementById('pPackage').innerHTML = `<span class="badge bg-primary">${student.package || '-'}</span>`;
+                document.getElementById('pAdmission').innerText = student.admissionMonth || student.admissionDate || '-';
+
+                // 🖼️ পূর্বের সংরক্ষিত ছবি থাকলে হেডারে লোড করা
+                const headerImg = document.getElementById('headerStudentPhoto');
+                const headerIcon = document.getElementById('headerUserIcon');
+                if (student.photoUrl && headerImg && headerIcon) {
+                    headerImg.src = student.photoUrl;
+                    headerImg.style.display = 'block';
+                    headerIcon.style.display = 'none';
+                    uploadedPhotoData = student.photoUrl;
+                } else if (headerImg && headerIcon) {
+                    headerImg.style.display = 'none';
+                    headerIcon.style.display = 'block';
+                }
+
+                const currentMonth = getCurrentMonthName();
+                const feeQ = query(collection(db, "fees"), where("studentDocId", "==", currentStudentId), where("month", "==", currentMonth));
+                const feeSnap = await getDocs(feeQ);
+
+                const dueBox = document.getElementById('dueBoxStatus');
+                const alertBox = document.getElementById('paymentAlert');
+                const statusText = document.getElementById('dashCurrentStatus');
+
+                if (!feeSnap.empty) {
+                    const fd = feeSnap.docs[0].data();
+                    if (fd.status === 'approved' || fd.status === 'paid') {
+                        statusText.innerText = 'পরিশোধিত ✅';
+                        dueBox.className = 'status-box bg-paid shadow-sm';
+                        alertBox.style.display = 'none';
+                    } else if (fd.status === 'pending') {
+                        statusText.innerText = 'যাচাই ⏳';
+                        dueBox.className = 'status-box bg-warning shadow-sm';
+                        alertBox.style.display = 'none';
+                    } else {
+                        statusText.innerText = 'বকেয়া ⚠️';
+                        dueBox.className = 'status-box bg-due shadow-sm';
+                        alertBox.style.display = 'block';
+                    }
+                } else {
+                    statusText.innerText = 'বকেয়া ⚠️';
+                    dueBox.className = 'status-box bg-due shadow-sm';
+                    alertBox.style.display = 'block';
+                }
+
+                loadPaymentHistory(currentStudentId);
+                updateLastPayment(currentStudentId);
+
+                if (student.batch) {
+                    loadStudentLiveClass(student.batch);
+                    loadClassLibrary(student.batch);
+                    loadWeeklyRoutine(student.batch);
+                }
+                
+                // 📢 নোটিশ নিরাপদে লোড করা (ফিক্সড)
+                loadStudentNotice(student.batch);
+
+                loadStudentAttendance(currentStudentId);
+                loadStudentResults(currentStudentId);
+
+            } catch (err) {
+                console.error("Dashboard Load Error:", err);
+                Swal.fire('ত্রুটি', 'ড্যাশবোর্ড লোড করতে সমস্যা হয়েছে।', 'error');
+            }
+        }
+
+        // ============ CLASS LIBRARY ============
+        function loadClassLibrary(batchName) {
+            const listDiv = document.getElementById('classLibraryList');
+            const countBadge = document.getElementById('totalClassCount');
+            if (!listDiv || !batchName) return;
+
+            const q = query(
+                collection(db, "live_classes"),
+                where("batch", "==", batchName)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    listDiv.innerHTML = '<p class="text-muted text-center small mb-0">এখনো কোনো ক্লাস রেকর্ড নেই</p>';
+                    if (countBadge) countBadge.innerText = '০ টি ক্লাস';
+                    return;
+                }
+
+                const classes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                classes.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+                listDiv.innerHTML = '';
+                let validCount = 0;
+
+                classes.forEach(x => {
+                    const hasSheet = x.classSheet && x.classSheet.trim() !== '';
+                    const hasRecord = x.classRecord && x.classRecord.trim() !== '';
+
+                    if (!hasSheet && !hasRecord) return;
+                    validCount++;
+
+                    let statusBadge = '';
+                    if (!x.isActive) {
+                        statusBadge = '<span class="badge bg-secondary">নিষ্ক্রিয়</span>';
+                    } else {
+                        const classDate = x.date ? new Date(x.date + 'T' + (x.time || '00:00')) : null;
+                        const now = new Date();
+                        if (classDate && classDate > now) {
+                            statusBadge = '<span class="badge bg-info">আসন্ন</span>';
+                        } else if (classDate && classDate <= now) {
+                            statusBadge = '<span class="badge bg-success">সম্পন্ন</span>';
+                        } else {
+                            statusBadge = '<span class="badge bg-warning text-dark">শেষ</span>';
+                        }
+                    }
+
+                    let dateDisplay = x.date || 'তারিখ নেই';
+                    try {
+                        if (x.date) {
+                            const d = new Date(x.date);
+                            dateDisplay = d.toLocaleDateString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric' });
+                        }
+                    } catch(e) {}
+
+                    listDiv.innerHTML += `
+                        <div class="border rounded p-3 mb-2 bg-white">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                <div>
+                                    <h6 class="fw-bold text-primary mb-1">
+                                        <i class="fas fa-chalkboard-teacher me-1"></i>
+                                        ${x.description || 'ক্লাস'}
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>${dateDisplay}
+                                        ${x.time ? ` • <i class="fas fa-clock me-1"></i>${x.time}` : ''}
+                                    </small>
+                                </div>
+                                ${statusBadge}
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap">
+                                ${hasSheet ? `<a href="${x.classSheet}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3"><i class="fas fa-file-pdf me-1"></i>ক্লাসের শিট</a>` : ''}
+                                ${hasRecord ? `<a href="${x.classRecord}" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3"><i class="fab fa-youtube me-1"></i>ভিডিও রেকর্ড</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (countBadge) countBadge.innerText = toBengaliNum(validCount) + ' টি ক্লাস';
+
+                if (validCount === 0) {
+                    listDiv.innerHTML = '<p class="text-muted text-center small mb-0">এখনো কোনো রিসোর্স আপলোড করা হয়নি</p>';
+                }
+            }, (err) => {
+                console.error("Class library error:", err);
+                listDiv.innerHTML = '<p class="text-danger text-center small mb-0">লোড করতে সমস্যা হয়েছে</p>';
+            });
+        }
+
+        // ============ COURSE PROGRESS ============
+        function updateCourseProgress(paidCount) {
+            const totalMonths = C.courseDurationMonths || 12;
+            let remaining = totalMonths - paidCount;
+            if (remaining < 0) remaining = 0;
+            
+            const pct = Math.min((paidCount / totalMonths) * 100, 100);
+            
+            const cText = document.getElementById('completedMonthsText');
+            const rText = document.getElementById('remainingMonthsText');
+            const bar = document.getElementById('dashboardCourseProgress');
+            
+            if (cText) cText.innerText = `পরিশোধিত/সম্পন্ন: ${toBengaliNum(paidCount)} মাস`;
+            if (rText) rText.innerText = `বাকি: ${toBengaliNum(remaining)} মাস`;
+            if (bar) {
+                bar.style.width = `${pct}%`;
+                bar.innerText = `${toBengaliNum(Math.round(pct))}%`;
+            }
+        }
+
+        // ============ PAYMENT HISTORY ============
+        function loadPaymentHistory(studentId) {
+            const tbody = document.getElementById('paymentHistoryBody');
+            
+            const q = query(
+                collection(db, "fees"),
+                where("studentDocId", "==", studentId)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                tbody.innerHTML = '';
+
+                const paidMonths = new Set();
+                if (currentStudentData && currentStudentData.admissionMonth) {
+                    paidMonths.add(currentStudentData.admissionMonth);
+                }
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">কোনো পেমেন্ট নেই</td></tr>';
+                    updateCourseProgress(paidMonths.size);
+                    return;
+                }
+
+                const feesList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                feesList.sort((a, b) => {
+                    const ta = a.timestamp?.toMillis ? a.timestamp.toMillis() : (new Date(a.date || 0)).getTime();
+                    const tb = b.timestamp?.toMillis ? b.timestamp.toMillis() : (new Date(b.date || 0)).getTime();
+                    return tb - ta;
+                });
+
+                let hasApproved = false, lastApprovedMonth = '-';
+
+                feesList.forEach(fee => {
+                    let statusBadge = '';
+                    
+                    if (fee.status === 'approved' || fee.status === 'paid') {
+                        statusBadge = '<span class="badge bg-success">পরিশোধিত</span>';
+                        if (!hasApproved) { hasApproved = true; lastApprovedMonth = fee.month; }
+                        if (fee.month) paidMonths.add(fee.month);
+                    } else if (fee.status === 'pending') {
+                        statusBadge = '<span class="badge bg-warning text-dark">যাচাই</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-danger">বকেয়া</span>';
+                    }
+
+                    const dispDate = fee.date || formatDate(fee.timestamp) || '-';
+                    const dispAmt = fee.amount ? `৳${toBengaliNum(fee.amount)}` : '-';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="fw-bold">${fee.month || '-'}</td>
+                            <td><small>${dispDate}</small></td>
+                            <td>${dispAmt}</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('dashLastPaid').innerText = hasApproved ? lastApprovedMonth : '-';
+                updateCourseProgress(paidMonths.size);
+            }, (err) => {
+                console.error("Payment History Error:", err);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">লোড করা সম্ভব হয়নি</td></tr>`;
+            });
+        }
+
+        // ============ LAST PAYMENT ============
+        async function updateLastPayment(studentId) {
+            try {
+                const q = query(
+                    collection(db, "fees"),
+                    where("studentDocId", "==", studentId),
+                    where("status", "in", ["approved", "paid"]),
+                    orderBy("timestamp", "desc"),
+                    limit(1)
+                );
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    const last = snap.docs[0].data();
+                    document.getElementById('dashLastPaid').innerText = last.month || '-';
+                }
+            } catch (err) {
+                console.error("Last Payment Error:", err);
+            }
+        }
+
+        // ============ WEEKLY ROUTINE ============
+        async function loadWeeklyRoutine(batchName) {
+            if (!batchName) return;
+            try {
+                const match = batchName.match(/^(.+?)\s*\(/);
+                const batchNameOnly = match ? match[1].trim() : batchName;
+                
+                const q = query(collection(db, "batches"));
+                const snap = await getDocs(q);
+                
+                let foundBatch = null;
+                snap.forEach(d => {
+                    const b = d.data();
+                    if (b.batchName === batchNameOnly || `${b.batchName} (${b.schedule})` === batchName) {
+                        foundBatch = b;
+                    }
+                });
+                
+                if (!foundBatch || !foundBatch.weeklyRoutine || Object.keys(foundBatch.weeklyRoutine).length === 0) {
+                    document.getElementById('routineCard').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('routineCard').style.display = 'block';
+                const tbody = document.getElementById('weeklyRoutineBody');
+                tbody.innerHTML = '';
+                
+                bnDays.forEach(day => {
+                    if (foundBatch.weeklyRoutine[day]) {
+                        const r = foundBatch.weeklyRoutine[day];
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="fw-bold">${day}</td>
+                                <td>${r.start || '-'} - ${r.end || '-'}</td>
+                            </tr>
+                        `;
+                    }
+                });
+                
+                if (tbody.innerHTML === '') {
+                    document.getElementById('routineCard').style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Routine error:", err);
+                document.getElementById('routineCard').style.display = 'none';
+            }
+        }
+
+        // ============ ATTENDANCE ============
+        async function loadStudentAttendance(studentId) {
+            const summaryDiv = document.getElementById('attendanceSummary');
+            const detailBody = document.getElementById('attendanceDetailBody');
+            const calendarDiv = document.getElementById('attendanceCalendar');
+            
+            try {
+                const q = query(collection(db, "attendance"), where("studentId", "==", studentId));
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    summaryDiv.innerHTML = '<p class="text-muted text-center small mb-0">এখনো কোনো হাজিরা রেকর্ড নেই</p>';
+                    detailBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">কোনো রেকর্ড নেই</td></tr>';
+                    calendarDiv.style.display = 'none';
+                    return;
+                }
+                
+                const records = [];
+                snap.forEach(d => records.push(d.data()));
+                records.sort((a, b) => b.date.localeCompare(a.date));
+                allAttendanceRecords = records;
+                
+                const present = records.filter(r => r.status === 'present').length;
+                const absent = records.filter(r => r.status === 'absent').length;
+                const late = records.filter(r => r.status === 'late').length;
+                const leave = records.filter(r => r.status === 'leave').length;
+                const total = records.length;
+                const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+                
+                summaryDiv.innerHTML = `
+                    <div class="row g-2 mb-3">
+                        <div class="col-3">
+                            <div class="att-summary-box" style="background: linear-gradient(135deg,#11998e,#38ef7d); color:#000;">
+                                <div class="num">${toBengaliNum(present)}</div>
+                                <div class="lbl">উপস্থিত</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="att-summary-box" style="background: linear-gradient(135deg,#cb2d3e,#ef473a);">
+                                <div class="num">${toBengaliNum(absent)}</div>
+                                <div class="lbl">অনুপস্থিত</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="att-summary-box" style="background: linear-gradient(135deg,#f7971e,#ffd200); color:#000;">
+                                <div class="num">${toBengaliNum(late)}</div>
+                                <div class="lbl">দেরি</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="att-summary-box" style="background: linear-gradient(135deg,#3a7bd5,#00d2ff);">
+                                <div class="num">${toBengaliNum(leave)}</div>
+                                <div class="lbl">ছুটি</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>উপস্থিতির হার (মোট ${toBengaliNum(total)} দিন)</span>
+                            <span class="fw-bold text-${pct >= 75 ? 'success' : 'danger'}">${toBengaliNum(pct)}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-${pct >= 75 ? 'success' : 'danger'}" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                calendarDiv.style.display = 'block';
+                renderCalendar();
+                
+                detailBody.innerHTML = '';
+                records.forEach(r => {
+                    const statusMap = {
+                        'present': { label: 'উপস্থিত', cls: 'success' },
+                        'absent': { label: 'অনুপস্থিত', cls: 'danger' },
+                        'late': { label: 'দেরি', cls: 'warning' },
+                        'leave': { label: 'ছুটি', cls: 'info' }
+                    };
+                    const sm = statusMap[r.status] || { label: r.status, cls: 'secondary' };
+                    detailBody.innerHTML += `
+                        <tr>
+                            <td class="small">${r.date}</td>
+                            <td class="small">${getDayName(r.date)}</td>
+                            <td><span class="badge bg-${sm.cls}">${sm.label}</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Attendance error:", err);
+                summaryDiv.innerHTML = '<p class="text-danger small text-center mb-0">লোড করতে সমস্যা</p>';
+            }
+        }
+
+        function renderCalendar() {
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+            const monthName = bnMonths[month] + ' ' + toBengaliNum(year);
+            document.getElementById('calendarMonthYear').innerText = monthName;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const startOffset = (firstDay + 1) % 7;
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysDiv = document.getElementById('calendarDays');
+            daysDiv.innerHTML = '';
+            
+            for (let i = 0; i < startOffset; i++) {
+                daysDiv.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const record = allAttendanceRecords.find(r => r.date === dateStr);
+                
+                let cls = '';
+                if (record) {
+                    if (record.status === 'present') cls = 'present';
+                    else if (record.status === 'absent') cls = 'absent';
+                    else if (record.status === 'late') cls = 'late';
+                    else if (record.status === 'leave') cls = 'leave';
+                }
+                
+                daysDiv.innerHTML += `<div class="calendar-day ${cls}">${toBengaliNum(d)}</div>`;
+            }
+        }
+
+        window.changeCalendarMonth = function(dir) {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + dir);
+            renderCalendar();
+        };
+
+        window.toggleAttendanceDetail = function() {
+            const d = document.getElementById('attendanceDetail');
+            d.style.display = d.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // ============ EXAM RESULTS ============
+        async function loadStudentResults(studentId) {
+            const div = document.getElementById('studentResultsList');
+            
+            try {
+                const q = query(
+                    collection(db, "exam_results"),
+                    where("studentId", "==", studentId)
+                );
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    div.innerHTML = '<p class="text-muted text-center small mb-0">এখনো কোনো ফলাফল নেই</p>';
+                    return;
+                }
+                
+                const results = [];
+                snap.forEach(d => results.push(d.data()));
+                results.sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
+                
+                const totalExams = results.length;
+                const passed = results.filter(r => r.grade !== 'F').length;
+                const failed = totalExams - passed;
+                const aPlus = results.filter(r => r.grade === 'A+' || r.grade === 'A').length;
+                const avgPct = Math.round(results.reduce((s, r) => s + (r.marks / r.totalMarks) * 100, 0) / totalExams);
+                
+                let html = `
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <div class="text-center p-2 rounded" style="background: #e0e7ff;">
+                                <div class="fw-bold fs-5 text-primary">${toBengaliNum(totalExams)}</div>
+                                <div class="small text-muted">মোট পরীক্ষা</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center p-2 rounded" style="background: #e8f5e9;">
+                                <div class="fw-bold fs-5 text-success">${toBengaliNum(passed)}</div>
+                                <div class="small text-muted">পাস</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center p-2 rounded" style="background: #ffebee;">
+                                <div class="fw-bold fs-5 text-danger">${toBengaliNum(failed)}</div>
+                                <div class="small text-muted">ফেল</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info py-2 mb-3 small">
+                        <i class="fas fa-chart-line me-1"></i>
+                        <b>গড় নম্বর:</b> ${toBengaliNum(avgPct)}%
+                    </div>
+                    
+                    <div style="position: relative; height: 200px; width: 100%; margin-bottom: 20px;">
+                        <canvas id="examChart"></canvas>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>পরীক্ষা</th>
+                                    <th class="text-center">নম্বর</th>
+                                    <th class="text-center">গ্রেড</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                results.forEach(r => {
+                    const gradeCls = r.grade === 'F' ? 'danger' : (r.grade === 'A+' || r.grade === 'A' ? 'success' : 'info');
+                    html += `
+                        <tr>
+                            <td>
+                                <div class="fw-bold small">${r.examName}</div>
+                                <small class="text-muted">${r.examDate || ''}</small>
+                            </td>
+                            <td class="text-center">
+                                <div class="fw-bold">${toBengaliNum(r.marks)}/${toBengaliNum(r.totalMarks)}</div>
+                                <small class="text-muted">${toBengaliNum(Math.round((r.marks / r.totalMarks) * 100))}%</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-${gradeCls} grade-badge">${r.grade}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+                div.innerHTML = html;
+                
+                if (examChartInstance) examChartInstance.destroy();
+                const ctx = document.getElementById('examChart');
+                if (ctx) {
+                    examChartInstance = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['A+ / A', 'পাস (B-D)', 'ফেল'],
+                            datasets: [{
+                                data: [aPlus, (passed - aPlus), failed],
+                                backgroundColor: ['#10b981', '#3b82f6', '#ef4444'],
+                                borderWidth: 2,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { font: { family: 'Hind Siliguri' } } }
+                            }
+                        }
+                    });
+                }
+                
+            } catch (err) {
+                console.error("Results error:", err);
+                div.innerHTML = '<p class="text-danger small text-center mb-0">লোড করতে সমস্যা</p>';
+            }
+        }
+
+        // ============ DOWNLOAD ID CARD ============
+        window.downloadIDCard = async function() {
+            if (!currentStudentData) {
+                Swal.fire('ত্রুটি', 'শিক্ষার্থীর তথ্য পাওয়া যায়নি', 'error');
+                return;
+            }
+            const s = currentStudentData;
+            
+            document.getElementById('idStudentName').innerText = s.studentName || '-';
+            document.getElementById('idStudentId').innerText = s.studentClass || (s.mobileNumber || '').slice(-4); 
+            document.getElementById('idBatch').innerText = s.batch || '-';
+            document.getElementById('idMobile').innerText = s.mobileNumber || '-';
+            document.getElementById('idAdmission').innerText = s.admissionMonth || s.admissionDate || '-';
+            
+            try {
+                const siteDoc = await getDoc(doc(db, 'settings', 'site'));
+                if (siteDoc.exists()) {
+                    document.getElementById('idSiteName').innerText = siteDoc.data().siteName || C.siteName || 'কোচিং সেন্টার';
+                } else {
+                    document.getElementById('idSiteName').innerText = C.siteName || 'কোচিং সেন্টার';
+                }
+            } catch(e) {
+                document.getElementById('idSiteName').innerText = C.siteName || 'কোচিং সেন্টার';
+            }
+            
+            const photoImg = document.getElementById('idCardPhoto');
+            const photoPlaceholder = document.getElementById('idPhotoPlaceholder');
+            
+            if (uploadedPhotoData) {
+                photoImg.src = uploadedPhotoData;
+                photoImg.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            } else {
+                photoImg.style.display = 'none';
+                photoPlaceholder.style.display = 'block';
+            }
+
+            const el = document.getElementById('idCardTemplate');
+            el.style.display = 'block';
+            
+            Swal.fire({ title: 'আইডি কার্ড তৈরি হচ্ছে...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+            
+            await document.fonts.ready;
+            
+            const opt = {
+                margin: 0,
+                filename: `ID_Card_${s.studentName.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 4, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'in', format: [3.375, 2.125], orientation: 'landscape' }
+            };
+            
+            html2pdf().set(opt).from(el).save().then(() => {
+                Swal.close();
+                el.style.display = 'none';
+                Swal.fire({ icon: 'success', title: 'ডাউনলোড সম্পন্ন!', text: 'আইডি কার্ডটি স্ট্যান্ডার্ড সাইজে সেভ হয়েছে।', timer: 2000, showConfirmButton: false });
+            }).catch(err => {
+                console.error(err);
+                Swal.close();
+                el.style.display = 'none';
+                Swal.fire('ত্রুটি', 'আইডি কার্ড তৈরি করা সম্ভব হয়নি', 'error');
+            });
+        };
+
+        console.log("Student Portal Loaded ✅");
+    </script>
+</body>
+</html>

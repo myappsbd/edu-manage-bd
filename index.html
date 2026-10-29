@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কোচিং সেন্টার</title>
+    <meta name="theme-color" content="#1e3a8a">
+    
+    <!-- Config -->
+    <script src="config.js"></script>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6; 
+            --accent-color: #eff6ff; 
+            --text-color: #1f2937; 
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f8fafc; color: var(--text-color); overflow-x: hidden; }
+        
+        .navbar { background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 15px 0; transition: all 0.3s; }
+        .navbar-brand { font-weight: 700; font-size: 1.4rem; color: var(--primary-color) !important; display: flex; align-items: center; }
+        .nav-link { color: #4b5563 !important; font-weight: 600; transition: 0.3s; padding: 10px 15px !important; position: relative; }
+        .nav-link:hover, .nav-link.active { color: var(--primary-color) !important; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 5px; left: 50%; background-color: var(--primary-color); transition: all 0.3s; transform: translateX(-50%); }
+        .nav-link:hover::after, .nav-link.active::after { width: 80%; }
+        
+        .hero-section { 
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white; padding: 120px 0 100px; text-align: center; position: relative; overflow: hidden;
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+        }
+        .hero-section::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hero-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 20px; position: relative; z-index: 1; }
+        
+        .card { border: none; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; height: 100%; background: #fff; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .feature-icon { color: var(--primary-color); background: var(--accent-color); width: 80px; height: 80px; line-height: 80px; border-radius: 20px; margin: 0 auto 20px; font-size: 35px; transform: rotate(-5deg); transition: 0.3s; }
+        .card:hover .feature-icon { transform: rotate(0deg) scale(1.1); }
+        
+        .btn-primary { background-color: var(--primary-color); border: none; color: #fff; font-weight: 600; padding: 12px 30px; border-radius: 10px; transition: 0.3s; }
+        .btn-primary:hover { background-color: #1e40af; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(30,58,138,0.3); }
+        
+        .batch-card { border-left: 6px solid var(--secondary-color); position: relative; overflow: hidden; }
+        .batch-card::before { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(59,130,246,0.05) 100%); z-index: 0; }
+        .batch-card > * { position: relative; z-index: 1; }
+        
+        .admission-progress-card { background: #ffffff; border-radius: 20px; padding: 30px; margin: -50px 0 40px; position: relative; z-index: 10; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .progress-bar-custom { height: 14px; border-radius: 10px; background: #e2e8f0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border-radius: 10px; transition: width 0.5s ease; }
+        
+        .bkash-payment { background: linear-gradient(135deg, #e2136e, #b00e53); color: white; border-radius: 16px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(226,19,110,0.2); }
+        .cash-payment { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 16px; padding: 25px; margin-bottom: 25px; }
+        
+        .form-control, .form-select { border-radius: 10px; border: 1px solid #d1d5db; padding: 12px 15px; transition: 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        
+        footer { background: #0f172a; color: #94a3b8; padding: 40px 0 20px; margin-top: 80px; }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.2rem; }
+            .admission-progress-card { margin: -30px 15px 30px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="javascript:void(0)" onclick="showSection('home')">
+                <img id="navLogo" src="https://i.postimg.cc/SKDRKmbL/ow.png" alt="Logo" style="height: 40px; margin-right: 10px;">
+                <span id="navSiteName">কোচিং নাম</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto text-center">
+                    <li class="nav-item"><a class="nav-link" href="javascript:void(0)" onclick="showSection('home')">হোম</a></li>  
+                    <li class="nav-item"><a class="nav-link" href="javascript:void(0)" onclick="showSection('admission_rules')">ভর্তির নিয়মাবলী</a></li>
+                    <li class="nav-item"><a class="nav-link" href="javascript:void(0)" onclick="showSection('application')">ভর্তির আবেদন</a></li>
+                    <li class="nav-item"><a class="nav-link" href="javascript:void(0)" onclick="showSection('monthly_fee')">মাসিক ফি</a></li>
+                    <li class="nav-item"><a class="nav-link" href="student.html" target="_blank">স্টুডেন্ট পোর্টাল</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin.html" target="_blank">এডমিন</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main id="mainContent" style="min-height: 80vh;">
+        <!-- 1. HOME SECTION -->
+        <section id="homePage">
+            <!-- 📢 স্ক্রলিং নোটিশ বার -->
+            <div id="noticeTickerContainer" class="bg-warning bg-opacity-25 border-bottom py-2" style="display: none;">
+                <div class="container d-flex align-items-center">
+                    <span class="badge bg-danger text-white me-2 px-3 py-2 fw-bold text-nowrap"><i class="fas fa-bullhorn me-1"></i>নোটিশ:</span>
+                    <marquee id="noticeTickerText" class="fw-bold text-dark small" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();"></marquee>
+                </div>
+            </div>
+ 
+            <div class="hero-section">
+                <div class="container">
+                    <h1 class="hero-title fw-bold" id="dynSiteName">EduManage</h1>
+                    <h3 class="fw-light mb-4 text-white-50" style="letter-spacing: 1px;">
+                        <span id="dynTagline">Manage Your Academy Digitally</span>
+                    </h3>
+                    <p class="lead mb-4 opacity-75" style="max-width: 700px; margin: 0 auto; font-size: 1.1rem;">
+                        শিক্ষার্থী ভর্তি, হাজিরা, ফি আদায় এবং রেজাল্ট—সবকিছু এখন এক জায়গায়, সম্পূর্ণ ডিজিটাল পদ্ধতিতে।
+                    </p>
+                    <button onclick="showSection('application')" class="btn btn-primary btn-lg mt-2 shadow rounded-pill px-4">
+                        <i class="fas fa-rocket me-2"></i> শুরু করুন
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admission Progress -->
+            <div class="container">
+                <div class="admission-progress-card">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h4 class="mb-3 text-dark fw-bold"><i class="fas fa-chart-line me-2 text-primary"></i>ভর্তির বর্তমান অবস্থা</h4>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted fw-bold">মোট ভর্তি হয়েছে</span>
+                                    <span class="fw-bold text-primary" id="totalEnrolledCount">লোড হচ্ছে...</span>
+                                </div>
+                                <div class="progress-bar-custom">
+                                    <div class="progress-fill" id="totalProgressFill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-4">
+                                <div class="col-4">
+                                    <div class="p-3 bg-light rounded-3 text-center border">
+                                        <h4 class="mb-0 fw-bold text-dark" id="totalSeatsCount">১০০</h4>
+                                        <small class="text-muted">মোট আসন</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-3 bg-light rounded-3 text-center border">
+                                        <h4 class="mb-0 fw-bold text-success" id="availableSeatsCount">১০০</h4>
+                                        <small class="text-muted">অবশিষ্ট আসন</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-3 bg-light rounded-3 text-center border">
+                                        <h4 class="mb-0 fw-bold text-primary" id="batchesCount">০</h4>
+                                        <small class="text-muted">সক্রিয় ব্যাচ</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                            <button onclick="showSection('application')" class="btn btn-primary w-100 py-3 rounded-pill shadow">
+                                <i class="fas fa-pencil-alt me-2"></i>ভর্তি হোন এখনই
+                            </button>
+                            <p class="mt-2 small text-muted">সিট সংখ্যা সীমিত, দ্রুত আবেদন করুন</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="container my-5">
+                <div class="row g-4 text-center">
+                    <div class="col-md-4">
+                        <div class="card p-4">
+                            <div class="feature-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                            <h5 class="fw-bold">অভিজ্ঞ শিক্ষকমণ্ডলী</h5>
+                            <p class="text-muted small">দীর্ঘ অভিজ্ঞতাসম্পন্ন ও যোগ্যতাসম্পন্ন শিক্ষক দিয়ে পাঠদান।</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-4">
+                            <div class="feature-icon"><i class="fas fa-book-open"></i></div>
+                            <h5 class="fw-bold">গুণগত শিক্ষা</h5>
+                            <p class="text-muted small">সঠিক দিকনির্দেশনা ও আধুনিক পদ্ধতিতে পাঠদান।</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-4">
+                            <div class="feature-icon"><i class="fas fa-laptop-house"></i></div>
+                            <h5 class="fw-bold">অনলাইন ও অফলাইন</h5>
+                            <p class="text-muted small">ঘরে বসেই বা সরাসরি ক্লাসে অংশ নেওয়ার সুযোগ।</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Batches -->
+            <div class="container my-5">
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0">আমাদের চলমান ব্যাচসমূহ</h2>
+                        <p class="text-muted mb-0">আপনার পছন্দের ব্যাচে ভর্তি হয়ে আজই শুরু করুন</p>
+                    </div>
+                </div>
+                <div class="row g-4" id="dynamicBatchContainer">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">ব্যাচ লোড হচ্ছে...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. RULES SECTION -->
+        <section id="coursesPage" style="display: none;">
+            <div class="container my-5 py-4">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold text-dark">ভর্তির নির্দেশনা ও নিয়মাবলী</h2>
+                    <p class="text-muted">সহজে ভর্তি হওয়ার জন্য নিচের নির্দেশনাগুলো অনুসরণ করুন</p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card p-4 p-md-5 border-0 shadow-lg">
+                            <ul class="list-group list-group-flush mb-4">
+                                <li class="list-group-item py-3 border-0 d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success mt-1 me-3 fs-5"></i>
+                                    <div><h6 class="fw-bold mb-1">ক্লাসের সময়সূচী</h6><p class="text-muted small mb-0">প্রতিটি ব্যাচে সপ্তাহে ৩ দিন ক্লাস অনুষ্ঠিত হবে। ক্লাস শুরুর ৫ মিনিট পূর্বে উপস্থিত থাকতে হবে।</p></div>
+                                </li>
+                                <li class="list-group-item py-3 border-0 bg-light rounded mb-2 d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success mt-1 me-3 fs-5"></i>
+                                    <div><h6 class="fw-bold mb-1">বিষয়সমূহ</h6><p class="text-muted small mb-0" id="dynSubjects">গণিত, ইংরেজি, বিজ্ঞান ও আইসিটি</p></div>
+                                </li>
+                                <li class="list-group-item py-3 border-0 d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success mt-1 me-3 fs-5"></i>
+                                    <div><h6 class="fw-bold mb-1">ফি পরিশোধ</h6><p class="text-muted small mb-0">প্রতি মাসের ১-১০ তারিখের মধ্যে মাসিক ফি পরিশোধ করতে হবে। বিলম্বে জরিমানা প্রযোজ্য হতে পারে।</p></div>
+                                </li>
+                                <li class="list-group-item py-3 border-0 bg-light rounded d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success mt-1 me-3 fs-5"></i>
+                                    <div><h6 class="fw-bold mb-1">পরীক্ষা ও ফলাফল</h6><p class="text-muted small mb-0">নিয়মিত মডেল টেস্ট নেওয়া হবে এবং ফলাফল অভিভাবকদের জানানো হবে।</p></div>
+                                </li>
+                            </ul>
+                            
+                            <div class="text-center mb-4">
+                                <button onclick="showSection('application')" class="btn btn-primary px-4 rounded-pill">আমি রাজি, ভর্তি হতে চাই</button>
+                            </div>
+
+                            <div class="pt-4 border-top text-center">
+                                <p class="text-muted small mb-3"><i class="fas fa-headset me-2 text-primary"></i>ভর্তি বা যেকোনো প্রয়োজনে যোগাযোগ করুন</p>
+                                <div class="d-flex flex-wrap justify-content-center gap-3" id="contactList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. REGISTRATION SECTION -->
+        <section id="registrationPage" style="display: none;">
+            <div class="container my-4 my-md-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="card shadow-lg border-0">
+                            <div class="card-header bg-primary text-white text-center py-4 border-0" style="border-radius: 16px 16px 0 0;">
+                                <h4 class="mb-0 fw-bold"><i class="fas fa-file-signature me-2"></i>ভর্তির আবেদন ফর্ম</h4>
+                                <p class="mb-0 small text-white-50 mt-1">সঠিক তথ্য দিয়ে ফর্মটি পূরণ করুন</p>
+                            </div>
+                            <div class="card-body p-4 p-md-5">
+                                <form id="registrationForm">
+                                    
+                                    <!-- Personal Info -->
+                                    <h5 class="text-primary mb-4 border-bottom pb-2 fw-bold">১. শিক্ষার্থীর ব্যক্তিগত তথ্য</h5>
+                                    <div class="row g-3 mb-5">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">শিক্ষার্থীর নাম <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="studentName" placeholder="শিক্ষার্থীর সম্পূর্ণ নাম" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">অভিভাবকের নাম <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="applicantName" placeholder="পিতা/মাতা/অভিভাবকের নাম" required>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">শিক্ষার্থীর মোবাইল <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="mobileNumber" placeholder="01XXXXXXXXX" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">অভিভাবকের মোবাইল (ঐচ্ছিক)</label>
+                                            <input type="text" class="form-control" id="guardianMobile" placeholder="01XXXXXXXXX">
+                                        </div>
+
+                                        <!-- 🔐 ৪-ডিজিটের স্টুডেন্ট পিন -->
+                                        <div class="col-md-6" id="studentPinContainer" style="display: none;">
+                                            <label class="form-label small fw-bold">পোর্টালে লগইনের জন্য ৪-ডিজিটের পিন <span class="text-danger">*</span></label>
+                                            <input type="password" class="form-control font-monospace" id="studentPin" maxlength="4" placeholder="যেমন: ১২৩৪">
+                                            <div class="form-text small text-muted">পরবর্তীতে স্টুডেন্ট পোর্টালে ঢুকতে এই পিনটি প্রয়োজন হবে।</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">শিক্ষার্থীর বয়স <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="studentAge" placeholder="যেমন: ১৫" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">লিঙ্গ <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="studentGender" required>
+                                                <option value="পুরুষ">ছেলে</option>
+                                                <option value="মহিলা">মেয়ে</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">শ্রেণী / ক্লাস <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="studentClass" placeholder="যেমন: ৯ম, HSC ২০২৬" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">বর্তমান ঠিকানা</label>
+                                            <input type="text" class="form-control" id="address" placeholder="গ্রাম/শহর, থানা, জেলা">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Batch & Package -->
+                                    <h5 class="text-primary mb-4 border-bottom pb-2 fw-bold">২. কোর্স ও ব্যাচ নির্বাচন</h5>
+                                    <div class="row g-3 mb-5">
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">ব্যাচ নির্বাচন করুন <span class="text-danger">*</span></label>
+                                            <select class="form-select form-select-lg text-primary fw-bold" id="batchSelection" required>
+                                                <option value="" selected disabled>-- লোড হচ্ছে... --</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">প্যাকেজ নির্বাচন করুন <span class="text-danger">*</span></label>
+                                            <div class="card p-4 bg-light border-0">
+                                                <div class="d-flex flex-wrap gap-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="package" id="pkgSingleMale" value="একক পুরুষ" checked>
+                                                        <label class="form-check-label fw-bold fs-5" for="pkgSingleMale">ছাত্র</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="package" id="pkgSingleFemale" value="একক মহিলা">
+                                                        <label class="form-check-label fw-bold fs-5" for="pkgSingleFemale">ছাত্রী</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment -->
+                                    <h5 class="text-primary mb-4 border-bottom pb-2 fw-bold">৩. পেমেন্ট তথ্য</h5>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold mb-3">পেমেন্ট মেথড নির্বাচন করুন <span class="text-danger">*</span></label>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="card p-3 border-2 cursor-pointer" onclick="document.getElementById('methodBkash').click()">
+                                                    <div class="form-check m-0">
+                                                        <input class="form-check-input" type="radio" name="paymentMethod" id="methodBkash" value="bkash" checked onchange="togglePaymentMethod('reg')">
+                                                        <label class="form-check-label fw-bold d-flex align-items-center" for="methodBkash">
+                                                            <i class="fas fa-mobile-alt text-primary me-2 fs-4"></i> অনলাইন পেমেন্ট (বিকাশ)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card p-3 border-2 cursor-pointer" onclick="document.getElementById('methodCash').click()">
+                                                    <div class="form-check m-0">
+                                                        <input class="form-check-input" type="radio" name="paymentMethod" id="methodCash" value="cash" onchange="togglePaymentMethod('reg')">
+                                                        <label class="form-check-label fw-bold d-flex align-items-center" for="methodCash">
+                                                            <i class="fas fa-hand-holding-usd text-success me-2 fs-4"></i> সরাসরি ক্যাশ জমা
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bkash-payment" id="bkashSection">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0 fw-bold"><i class="fas fa-wallet me-2"></i>বিকাশ পেমেন্ট</h6>
+                                            <span class="badge bg-white text-danger fw-bold fs-6" id="dynBkash">01XXXXXXXXX</span>
+                                        </div>
+                                        <p class="mb-3 text-white-50 small">উপরের নম্বরে Send Money করে নিচে TrxID দিন।</p>
+                                        <div class="row align-items-end">
+                                            <div class="col-md-8">
+                                                <label class="text-white mb-1 small fw-bold">Transaction ID (TrxID)</label>
+                                                <input type="text" class="form-control text-center font-monospace" id="bkashTrx" placeholder="যেমন: 8A7B6C5D">
+                                            </div>
+                                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                                <div class="text-white-50 small mb-0">মোট পেমেন্ট</div>
+                                                <h3 class="text-warning mb-0 fw-bold" id="displayAmount">৳ ৫০০</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="cashSection" class="cash-payment" style="display: none;">
+                                        <h6 class="text-dark fw-bold border-bottom border-dark pb-2 mb-3"><i class="fas fa-user-check me-2"></i>ক্যাশ জমার তথ্য</h6>
+                                        <div class="row align-items-end">
+                                            <div class="col-md-8 mb-3 mb-md-0">
+                                                <label class="form-label small fw-bold text-dark">বুথ নির্বাচন করুন <span class="text-danger">*</span></label>
+                                                <select class="form-select border-warning" id="cashBoothSelect">
+                                                    <option value="" selected disabled>-- লোড হচ্ছে... --</option>
+                                                </select>
+                                                <div class="form-text text-muted small mt-1">বি:দ্র: ক্যাশ পেমেন্টের ক্ষেত্রে বুথ নির্বাচন বাধ্যতামূলক।</div>
+                                            </div>
+                                            <div class="col-md-4 text-md-end">
+                                                <div class="small text-muted mb-0">জমা দেওয়ার পরিমাণ</div>
+                                                <h3 class="text-dark mb-0 fw-bold" id="displayAmountCash">৳ ৫০০</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check mb-4 mt-4 p-3 bg-light rounded border">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms">
+                                        <label class="form-check-label small fw-bold text-dark" for="agreeTerms">আমি সকল শর্তাবলী মেনে আবেদন করছি এবং প্রদত্ত তথ্য সঠিক।</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary w-100 py-3 fs-5 rounded-pill" id="submitBtn" disabled>আবেদন জমা দিন <i class="fas fa-paper-plane ms-2"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 4. MONTHLY FEE SECTION -->
+        <section id="feePage" style="display: none;">
+            <div class="container my-4 my-md-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-9">
+                        <div class="card shadow border-0">
+                            <div class="card-header bg-primary text-white text-center py-4 border-0" style="border-radius: 16px 16px 0 0;">
+                                <h4 class="mb-0 fw-bold"><i class="fas fa-money-bill-wave me-2"></i>মাসিক ফি পরিশোধ</h4>
+                            </div>
+                            <div class="card-body p-4 p-md-5">
+                                <form id="feeForm">
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold">শিক্ষার্থীর মোবাইল নম্বর</label>
+                                        <div class="input-group input-group-lg">
+                                            <input type="text" class="form-control" id="feeMobile" required placeholder="01XXXXXXXXX">
+                                            <button class="btn btn-warning fw-bold" type="button" onclick="verifyStudentFee()">
+                                                <i class="fas fa-search me-1"></i> খুঁজুন
+                                            </button>
+                                        </div>
+                                        <div id="studentFoundMsg" class="form-text text-success fw-bold mt-2" style="display:none;"></div>
+                                        
+                                        <div id="courseDurationBox" class="alert alert-info mt-3 p-3 border-0 bg-opacity-10 rounded-3" style="display:none; font-size: 0.9rem;">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small fw-bold">কোর্স অগ্রগতি:</span>
+                                                <span id="remainingMonthText" class="text-danger fw-bold small"></span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div id="courseProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">মাসের নাম</label>
+                                            <select class="form-select form-select-lg" id="feeMonth" required>
+                                                <option value="" disabled selected>অপেক্ষা করুন...</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">পরিমাণ (টাকা)</label>
+                                            <input type="text" class="form-control form-control-lg bg-light" id="feeAmount" value="500" required readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold mb-2">পেমেন্ট মেথড</label>
+                                        <div class="d-flex gap-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="feePaymentMethod" id="feeMethodBkash" value="bkash" checked onchange="togglePaymentMethod('fee')">
+                                                <label class="form-check-label fw-bold" for="feeMethodBkash">বিকাশ</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="feePaymentMethod" id="feeMethodCash" value="cash" onchange="togglePaymentMethod('fee')">
+                                                <label class="form-check-label fw-bold" for="feeMethodCash">ক্যাশ</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bkash-payment" id="feeBkashSection">
+                                        <div class="text-center mb-3">
+                                            <p class="mb-1 text-white small">বিকাশ পেমেন্ট নম্বর</p>
+                                            <h4 class="text-warning fw-bold user-select-all mb-0" id="dynBkash2">01XXXXXXXXX</h4>
+                                        </div>
+                                        <input type="text" class="form-control text-center font-monospace" id="feeTrx" placeholder="এখানে TrxID লিখুন">
+                                    </div>
+                                    
+                                    <div class="cash-payment" id="feeCashSection" style="display: none;">
+                                        <label class="form-label small fw-bold">বুথ নির্বাচন করুন <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="feeBoothSelect">
+                                            <option value="" selected disabled>-- লোড হচ্ছে... --</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100 mt-4 py-3 fs-5 rounded-pill" id="feeSubmitBtn" disabled>ফি জমা দিন</button>
+                                </form>
+                                
+                                <div class="mt-4 pt-4 border-top text-center">
+                                    <p class="text-muted small mb-3"><i class="fas fa-headset me-2 text-primary"></i>প্রয়োজনে যোগাযোগ করুন</p>
+                                    <div class="d-flex flex-wrap justify-content-center gap-3" id="feeContactList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-1 small" id="footerText">&copy; ২০২৬ কোচিং সেন্টার। সর্বস্বত্ব সংরক্ষিত।</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { 
+            getFirestore, collection, addDoc, getDocs, doc, getDoc,
+            query, where, orderBy, onSnapshot, serverTimestamp, enableNetwork, writeBatch
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // ⚙️ config.js থেকে কনফিগ লোড হচ্ছে
+        const C = window.COACHING_CONFIG || {};
+        const firebaseConfig = C.firebaseConfig;
+
+        if (!firebaseConfig || !firebaseConfig.apiKey) {
+            console.error("ত্রুটি: config.js ফাইলে firebaseConfig পাওয়া যায়নি!");
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ============ DYNAMIC BRANDING ============
+        const loadDynamicBranding = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, 'settings', 'site'));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const newSiteName = data.siteName || C.siteName;
+                    const newShortName = data.siteShortName || C.siteShortName;
+                    const newLogo = data.logoUrl || C.logoUrl;
+
+                    document.querySelectorAll('#dynSiteName, #navSiteName').forEach(el => {
+                        el.textContent = el.id === 'navSiteName' ? newShortName : newSiteName;
+                    });
+                    document.title = newSiteName;
+
+                    if (newLogo) {
+                        document.querySelectorAll('img[alt="Logo"], img#navLogo').forEach(img => img.src = newLogo);
+                    }
+                }
+            } catch (e) { console.log("Branding fetch skipped", e); }
+        };
+        document.addEventListener('DOMContentLoaded', loadDynamicBranding);
+
+        // ============ HELPERS ============
+        function toBengaliNum(n) { return (n ?? 0).toString().replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]); }
+        const bnMonths = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+        const bnDays = ['শনিবার', 'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার'];
+
+        function getCurrentMonthName() {
+            const d = new Date();
+            return `${bnMonths[d.getMonth()]}-${toBengaliNum(d.getFullYear())}`;
+        }
+
+        function parseMonthYear(str) {
+            if (!str) return new Date();
+            try {
+                const p = str.split('-');
+                const m = bnMonths.indexOf(p[0]);
+                const y = parseInt(p[1].replace(/[০-৯]/g, d => "0123456789"["০১২৩৪৫৬৭৮৯".indexOf(d)]));
+                if (m === -1 || isNaN(y)) return new Date();
+                return new Date(y, m, 1);
+            } catch (e) { return new Date(); }
+        }
+
+        function formatMonthYear(d) {
+            return `${bnMonths[d.getMonth()]}-${toBengaliNum(d.getFullYear())}`;
+        }
+
+        function sanitizeMobile(input) {
+            if (!input) return '';
+            return input.toString().replace(/\D/g, '').slice(-11);
+        }
+
+        function isPhoneMatch(dbNum, inputNum) {
+            if (!dbNum || !inputNum) return false;
+            return sanitizeMobile(dbNum) === sanitizeMobile(inputNum);
+        }
+
+        // ============ CONFIG APPLIER ============
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!C) return;
+            document.title = C.siteName || 'কোচিং সেন্টার';
+            document.querySelectorAll('#dynSiteName').forEach(e => e.textContent = C.siteName || '');
+            document.querySelectorAll('#navSiteName').forEach(e => e.textContent = C.siteShortName || C.siteName || '');
+            document.querySelectorAll('#dynTagline').forEach(e => e.textContent = C.tagline || '');
+            document.querySelectorAll('#dynBkash, #dynBkash2').forEach(e => e.textContent = C.bkashNumber || '01XXXXXXXXX');
+            document.querySelectorAll('#dynSubjects').forEach(e => e.textContent = C.subjects || '');
+            
+            // 🔐 পিন অপশন অন থাকলে ফর্ম ফিল্ড প্রদর্শন
+            if (C.enableStudentPin !== false) {
+                const pinBox = document.getElementById('studentPinContainer');
+                if (pinBox) pinBox.style.display = 'block';
+                const pinInp = document.getElementById('studentPin');
+                if (pinInp) pinInp.required = true;
+            }
+
+            if (C.logoUrl) {
+                document.querySelectorAll('img[alt="Logo"], img#navLogo').forEach(img => img.src = C.logoUrl);
+            }
+            
+            const hero = document.querySelector('.hero-section');
+            if (hero && C.heroBackground) {
+                hero.style.backgroundImage = `linear-gradient(rgba(30,58,138,0.9), rgba(59,130,246,0.8)), url('${C.heroBackground}')`;
+            }
+            
+            const foot = document.getElementById('footerText');
+            if (foot && C.footerCopyright) foot.textContent = C.footerCopyright;
+            
+            const contactHtml = (C.contactNumbers || []).map(n => 
+                `<a href="tel:${n}" class="btn btn-outline-primary btn-sm rounded-pill"><i class="fas fa-phone-alt me-1"></i> ${n}</a>`
+            ).join('');
+            document.querySelectorAll('#contactList, #feeContactList').forEach(el => {
+                if (el) el.innerHTML = contactHtml;
+            });
+        });
+
+        // ============ NAVIGATION ============
+        const sectionMap = {
+            'home': 'homePage',
+            'admission_rules': 'coursesPage',
+            'application': 'registrationPage',
+            'monthly_fee': 'feePage'
+        };
+
+        window.showSection = function(sectionName, updateHistory = true) {
+            if (!sectionMap[sectionName]) sectionName = 'home';
+            Object.values(sectionMap).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            
+            const msgBox = document.getElementById('studentFoundMsg');
+            if (msgBox) msgBox.style.display = 'none';
+            const durBox = document.getElementById('courseDurationBox');
+            if (durBox) durBox.style.display = 'none';
+            const feeBtn = document.getElementById('feeSubmitBtn');
+            if (feeBtn) feeBtn.disabled = true;
+
+            const targetEl = document.getElementById(sectionMap[sectionName]);
+            if (targetEl) {
+                targetEl.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+
+            if (updateHistory) {
+                const newUrl = sectionName === 'home' ? window.location.pathname : '#' + sectionName;
+                history.pushState({ section: sectionName }, '', newUrl);
+            }
+            
+            const nc = document.querySelector('.navbar-collapse');
+            if (nc && nc.classList.contains('show')) {
+                new bootstrap.Collapse(nc).hide();
+            }
+        };
+
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.replace('#', '');
+            window.showSection(hash || 'home', false);
+        });
+        window.addEventListener('popstate', () => {
+            const hash = window.location.hash.replace('#', '');
+            window.showSection(hash || 'home', false);
+        });
+
+        // ============ PACKAGE & PRICING ============
+        let currentPrice = C.defaultAdmissionFee || 500;
+
+        const displayAmountEl = document.getElementById('displayAmount');
+        const displayAmountCashEl = document.getElementById('displayAmountCash');
+
+        function updatePriceDisplay() {
+            const bnPrice = '৳ ' + toBengaliNum(currentPrice);
+            if (displayAmountEl) displayAmountEl.innerText = bnPrice;
+            if (displayAmountCashEl) displayAmountCashEl.innerText = bnPrice;
+        }
+        
+        document.getElementById('batchSelection').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const batchFee = selectedOption.getAttribute('data-fee');
+            if (batchFee) {
+                currentPrice = parseInt(batchFee);
+                updatePriceDisplay();
+            }
+        });
+        
+        updatePriceDisplay();
+
+        // ============ PAYMENT TOGGLE ============
+        window.togglePaymentMethod = function(type) {
+            let isCash, bkashSec, cashSec, trxInput;
+            if (type === 'reg') {
+                isCash = document.getElementById('methodCash').checked;
+                bkashSec = document.getElementById('bkashSection');
+                cashSec = document.getElementById('cashSection');
+                trxInput = document.getElementById('bkashTrx');
+                validateForm(); 
+            } else {
+                isCash = document.getElementById('feeMethodCash').checked;
+                bkashSec = document.getElementById('feeBkashSection');
+                cashSec = document.getElementById('feeCashSection');
+                trxInput = document.getElementById('feeTrx');
+            }
+
+            if (isCash) {
+                bkashSec.style.display = 'none';
+                cashSec.style.display = 'block';
+                trxInput.value = ''; 
+            } else {
+                bkashSec.style.display = 'block';
+                cashSec.style.display = 'none';
+                const r = document.getElementById(type === 'reg' ? 'cashBoothSelect' : 'feeBoothSelect');
+                if (r) r.value = '';
+            }
+        };
+
+        const regTrxInput = document.getElementById('bkashTrx');
+        const regReceiver = document.getElementById('cashBoothSelect');
+        const termsCheck = document.getElementById('agreeTerms');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function validateForm() {
+            const isCash = document.getElementById('methodCash').checked;
+            let valid = false;
+            if (termsCheck.checked) {
+                if (isCash) {
+                    if (regReceiver.value && regReceiver.value !== "") valid = true;
+                } else {
+                    if (regTrxInput.value.trim().length >= 5) valid = true;
+                }
+            }
+            if (valid) {
+                submitBtn.disabled = false;
+                submitBtn.classList.replace('btn-secondary', 'btn-primary');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.replace('btn-primary', 'btn-secondary');
+            }
+        }
+
+        regTrxInput.addEventListener('input', validateForm);
+        regReceiver.addEventListener('change', validateForm);
+        termsCheck.addEventListener('change', validateForm);
+
+        // ============ DYNAMIC BATCHES ============
+        function loadBatches() {
+            const q = query(collection(db, "batches"), orderBy("timestamp", "asc"));
+            onSnapshot(q, async (batchSnapshot) => {
+                const batchContainer = document.getElementById('dynamicBatchContainer');
+                const batchSelect = document.getElementById('batchSelection');
+                
+                batchContainer.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p>তথ্য যাচাই হচ্ছে...</p></div>';
+                
+                const studQ = query(collection(db, "students"), where("status", "==", "approved"));
+                const studentSnapshot = await getDocs(studQ);
+                
+                const batchCounts = {};
+                studentSnapshot.forEach(d => {
+                    const s = d.data();
+                    batchCounts[s.batch] = (batchCounts[s.batch] || 0) + 1;
+                });
+
+                batchContainer.innerHTML = '';
+                batchSelect.innerHTML = '<option value="" selected disabled>-- ব্যাচ নির্বাচন করুন --</option>';
+
+                if (batchSnapshot.empty) {
+                    batchContainer.innerHTML = '<div class="col-12 text-center text-muted py-5">বর্তমানে কোনো ব্যাচ চলছে না</div>';
+                    return;
+                }
+
+                batchSnapshot.forEach(d => {
+                    const data = d.data();
+                    const fullBatchName = `${data.batchName} (${data.schedule})`;
+                    const currentCount = batchCounts[fullBatchName] || 0;
+                    const seatLimit = data.seatLimit ? parseInt(data.seatLimit) : 100; 
+                    const seatsLeft = seatLimit - currentCount;
+                    const isFull = currentCount >= seatLimit;
+                    const progressPercentage = Math.min((currentCount / seatLimit) * 100, 100);
+                    const fee = data.batchFee || 500;
+
+                    let startDateDisplay = 'নির্ধারিত হয়নি';
+                    if (data.startDate) {
+                        const date = new Date(data.startDate);
+                        startDateDisplay = date.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+                    }
+
+                    let leftBadge = !isFull 
+                        ? `<span class="badge bg-success position-absolute top-0 start-0 m-3 shadow-sm"><i class="fas fa-chair me-1"></i>আসন: ${toBengaliNum(seatsLeft)}টি</span>` 
+                        : `<span class="badge bg-danger position-absolute top-0 start-0 m-3 shadow-sm"><i class="fas fa-times-circle me-1"></i>আসন পূর্ণ</span>`;
+                    
+                    let rightBadge = isFull 
+                        ? `<span class="badge bg-danger position-absolute top-0 end-0 m-3 shadow-sm">ভর্তি শেষ</span>` 
+                        : `<span class="badge bg-primary position-absolute top-0 end-0 m-3 shadow-sm"><i class="fas fa-users me-1"></i>${toBengaliNum(currentCount)}/${toBengaliNum(seatLimit)}</span>`;
+                    
+                    let cardClass = isFull 
+                        ? 'card batch-card p-4 h-100 shadow-sm bg-light text-muted border-danger opacity-75' 
+                        : 'card batch-card p-4 h-100 shadow-sm border-0';
+
+                    let routineHtml = '';
+                    if (data.weeklyRoutine && Object.keys(data.weeklyRoutine).length > 0) {
+                        routineHtml = '<div class="mb-3 d-flex flex-wrap gap-1">';
+                        bnDays.forEach(day => {
+                            if (data.weeklyRoutine[day]) {
+                                const r = data.weeklyRoutine[day];
+                                routineHtml += `<span class="badge bg-light text-dark border"><b>${day.slice(0, 3)}:</b> ${r.start}</span>`;
+                            }
+                        });
+                        routineHtml += '</div>';
+                    }
+
+                    batchContainer.innerHTML += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="${cardClass}" style="position: relative; min-height: 380px;">
+                            ${leftBadge}
+                            ${rightBadge}
+                            
+                            <div class="mt-4 pt-3 text-center">
+                                <h5 class="${isFull ? 'text-muted' : 'text-primary'} fw-bold mb-1">
+                                    <i class="fas fa-layer-group me-2"></i>${data.batchName}
+                                </h5>
+                                <p class="mb-2 fw-bold text-secondary fs-6">${data.schedule}</p>
+                                <div class="mb-2 text-success fw-bold fs-5">৳ ${toBengaliNum(fee)}</div>
+                                <div class="mb-3 small bg-light p-2 rounded d-inline-block">
+                                    <i class="fas fa-calendar-alt text-success me-1"></i>
+                                    <span class="fw-bold">শুরু:</span> ${startDateDisplay}
+                                </div>
+                                ${routineHtml}
+                            </div>
+                            
+                            <div class="mt-3 mb-3 px-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small text-muted fw-bold"><i class="fas fa-chart-line me-1"></i>অগ্রগতি</span>
+                                    <span class="small fw-bold ${isFull ? 'text-danger' : 'text-success'}">
+                                        ${toBengaliNum(Math.round(progressPercentage))}%
+                                    </span>
+                                </div>
+                                <div class="progress" style="height: 8px; border-radius: 10px;">
+                                    <div class="progress-bar ${isFull ? 'bg-danger' : 'bg-success'}" 
+                                         role="progressbar" 
+                                         style="width: ${progressPercentage}%; border-radius: 10px;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 text-center position-absolute bottom-0 start-0 end-0 p-4">
+                                ${!isFull ? 
+                                    `<button onclick="showSection('application'); selectBatch('${fullBatchName}')" class="btn btn-primary w-100 py-2 fw-bold rounded-pill"><i class="fas fa-user-plus me-2"></i>ভর্তি হোন</button>` : 
+                                    `<button class="btn btn-secondary w-100 py-2 fw-bold rounded-pill" disabled><i class="fas fa-times-circle me-2"></i>আসন পূর্ণ</button>`
+                                }
+                            </div>
+                        </div>
+                    </div>`;
+
+                    if (isFull) {
+                        batchSelect.innerHTML += `<option value="${fullBatchName}" data-fee="${fee}" disabled class="text-danger">${fullBatchName} (পূর্ণ)</option>`;
+                    } else {
+                        batchSelect.innerHTML += `<option value="${fullBatchName}" data-fee="${fee}" class="text-success">${fullBatchName} - (ফি: ৳${toBengaliNum(fee)} | বাকি ${toBengaliNum(seatsLeft)}টি)</option>`;
+                    }
+                });
+                
+                if (batchSelect.options.length > 1) {
+                    batchSelect.selectedIndex = 1;
+                    const initialFee = batchSelect.options[1].getAttribute('data-fee');
+                    if (initialFee) {
+                        currentPrice = parseInt(initialFee);
+                        updatePriceDisplay();
+                    }
+                }
+            });
+        }
+
+        window.selectBatch = function(batchName) {
+            const batchSelect = document.getElementById('batchSelection');
+            if (batchSelect) {
+                for (let option of batchSelect.options) {
+                    if (option.value === batchName) {
+                        option.selected = true;
+                        const fee = option.getAttribute('data-fee');
+                        if (fee) {
+                            currentPrice = parseInt(fee);
+                            updatePriceDisplay();
+                        }
+                        batchSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        break;
+                    }
+                }
+            }
+        };
+        
+        loadBatches();
+
+        // ============ LOAD BOOTHS ============
+        function loadBooths() {
+            const q = query(collection(db, "booths"), orderBy("timestamp", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const regSelect = document.getElementById('cashBoothSelect');
+                const feeSelect = document.getElementById('feeBoothSelect');
+                
+                let options = '<option value="" selected disabled>-- বুথ নির্বাচন করুন --</option>';
+                if (snapshot.empty) {
+                    options = '<option value="" disabled>কোনো বুথ চালু নেই</option>';
+                } else {
+                    snapshot.forEach(d => {
+                        const x = d.data();
+                        const v = `${x.boothName} (${x.coordinator})`;
+                        options += `<option value="${v}">${v}</option>`;
+                    });
+                }
+                if (regSelect) regSelect.innerHTML = options;
+                if (feeSelect) feeSelect.innerHTML = options;
+            });
+        }
+        loadBooths();
+
+        // ============ FEE VERIFICATION ============
+        let verifiedStudentId = null;
+
+        window.verifyStudentFee = async function() {
+            const mobile = document.getElementById('feeMobile').value.trim();
+            const msgBox = document.getElementById('studentFoundMsg');
+            const durationBox = document.getElementById('courseDurationBox');
+            const amtBox = document.getElementById('feeAmount');
+            const monthSelect = document.getElementById('feeMonth');
+            const subBtn = document.getElementById('feeSubmitBtn');
+
+            if (mobile.length < 6) { 
+                Swal.fire('সতর্কতা', 'সঠিক মোবাইল নম্বর দিন', 'warning'); 
+                return; 
+            }
+
+            msgBox.style.display = 'block';
+            msgBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> খুঁজছি...';
+            msgBox.className = 'form-text text-warning mt-2 fw-bold';
+            durationBox.style.display = 'none';
+            monthSelect.innerHTML = '<option value="" disabled selected>যাচাই হচ্ছে...</option>';
+            subBtn.disabled = true;
+
+            try {
+                try { await enableNetwork(db); } catch (e) {}
+                
+                const allStudentsQuery = query(collection(db, "students"), where("status", "==", "approved"));
+                const snap = await getDocs(allStudentsQuery);
+                
+                let matched = null, matchedId = null;
+                snap.forEach(d => {
+                    const s = d.data();
+                    if (isPhoneMatch(s.mobileNumber, mobile)) { matched = s; matchedId = d.id; return; }
+                    if (s.whatsappNumber && isPhoneMatch(s.whatsappNumber, mobile)) { matched = s; matchedId = d.id; return; }
+                });
+
+                if (matched) {
+                    verifiedStudentId = matchedId;
+                    
+                    msgBox.className = 'form-text text-success fw-bold mt-2';
+                    const pkgName = matched.package ? ` - ${matched.package}` : '';
+                    msgBox.innerHTML = `<i class="fas fa-check-circle"></i> ${matched.studentName} (${matched.batch}${pkgName})`;
+                    
+                    amtBox.value = matched.amount || (C.defaultMonthlyFee || 500); 
+                    subBtn.disabled = false;
+
+                    const paidMonths = new Set();
+                    if (matched.admissionMonth) paidMonths.add(matched.admissionMonth);
+
+                    const feeQ = query(collection(db, "fees"), where("studentDocId", "==", verifiedStudentId));
+                    const feeSnapshot = await getDocs(feeQ);
+                    feeSnapshot.forEach(d => {
+                        const fd = d.data();
+                        if (fd.status === 'approved' || fd.status === 'pending') paidMonths.add(fd.month);
+                    });
+
+                    const totalMonths = C.courseDurationMonths || 12;
+                    const paidCount = paidMonths.size;
+                    let remaining = totalMonths - paidCount;
+                    if (remaining < 0) remaining = 0;
+
+                    durationBox.style.display = 'block';
+                    document.getElementById('remainingMonthText').innerText = `বাকি: ${toBengaliNum(remaining)} মাস`;
+                    document.getElementById('courseProgress').style.width = `${(paidCount / totalMonths) * 100}%`;
+
+                    monthSelect.innerHTML = ''; 
+                    let loopDate = parseMonthYear(matched.admissionMonth || getCurrentMonthName()); 
+                    let added = 0;
+                    for (let i = 0; i < 48; i++) { 
+                        const mStr = formatMonthYear(loopDate);
+                        if (!paidMonths.has(mStr)) {
+                            const option = document.createElement('option');
+                            option.value = mStr;
+                            option.text = mStr;
+                            if (added === 0) option.selected = true;
+                            monthSelect.appendChild(option);
+                            added++;
+                        }
+                        if (added >= 12) break;
+                        loopDate.setMonth(loopDate.getMonth() + 1);
+                    }
+
+                    if (remaining <= 0) {
+                        monthSelect.innerHTML = '<option disabled>কোর্স সম্পন্ন</option>';
+                        subBtn.disabled = true;
+                        Swal.fire('অভিনন্দন', 'আপনার কোর্স ফি পরিশোধ সম্পন্ন হয়েছে!', 'success');
+                    }
+                } else {
+                    msgBox.className = 'form-text text-danger fw-bold mt-2';
+                    msgBox.innerHTML = `<i class="fas fa-times-circle"></i> কোনো অনুমোদিত শিক্ষার্থী পাওয়া যায়নি।`;
+                    monthSelect.innerHTML = '<option value="" disabled selected>পাওয়া যায়নি</option>';
+                    subBtn.disabled = true;
+                    verifiedStudentId = null;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                msgBox.className = 'form-text text-danger fw-bold mt-2';
+                msgBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন।`;
+            }
+        };
+
+        // ============ FORM VALIDATION ============
+        function showFieldError(input, message) {
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            let fb = input.nextElementSibling;
+            if (!fb || !fb.classList.contains('invalid-feedback')) {
+                fb = document.createElement('div');
+                fb.className = 'invalid-feedback fw-bold';
+                input.parentNode.insertBefore(fb, input.nextSibling);
+            }
+            fb.innerText = message;
+        }
+
+        function showFieldSuccess(input) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            const fb = input.nextElementSibling;
+            if (fb && fb.classList.contains('invalid-feedback')) fb.remove();
+        }
+
+        function validateMobileNumber(input) {
+            let raw = input.value.trim();
+            let english = raw.replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d));
+            if (raw !== english) input.value = english;
+            
+            const bdRegex = /^(?:\+88|88)?01[3-9]\d{8}$/;
+            
+            if (bdRegex.test(english)) {
+                showFieldSuccess(input);
+                return true;
+            } else {
+                showFieldError(input, 'সঠিক ১১-ডিজিটের মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx)');
+                return false;
+            }
+        }
+
+        function validateName(input) {
+            const v = input.value.trim();
+            const regex = /^[a-zA-Z\u0980-\u09FF\s.]{2,50}$/;
+            if (v.length < 2) { showFieldError(input, 'নাম খুব ছোট'); return false; }
+            if (v.length > 50) { showFieldError(input, 'নাম খুব বড়'); return false; }
+            if (!regex.test(v)) { showFieldError(input, 'শুধু অক্ষর ব্যবহার করুন'); return false; }
+            showFieldSuccess(input);
+            return true;
+        }
+
+        function validateAge(input) {
+            let en = input.value.trim().replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d));
+            const v = parseInt(en);
+            if (isNaN(v) || v < 4) { showFieldError(input, 'সঠিক বয়স দিন'); return false; }
+            if (v > 100) { showFieldError(input, 'সঠিক বয়স দিন'); return false; }
+            showFieldSuccess(input);
+            return true;
+        }
+
+        function validateTrxID(input) {
+            const v = input.value.trim();
+            const regex = /^[A-Z0-9]{6,16}$/i;
+            if (v.length < 5) { showFieldError(input, 'TrxID খুব ছোট'); return false; }
+            if (!regex.test(v)) { showFieldError(input, 'সঠিক TrxID দিন'); return false; }
+            showFieldSuccess(input);
+            return true;
+        }
+
+        function validateRegistrationForm() {
+            let valid = true;
+            valid = validateName(document.getElementById('studentName')) && valid;
+            valid = validateName(document.getElementById('applicantName')) && valid;
+            valid = validateMobileNumber(document.getElementById('mobileNumber')) && valid;
+            
+            const guardianMobile = document.getElementById('guardianMobile');
+            if (guardianMobile.value.trim() !== "") {
+                valid = validateMobileNumber(guardianMobile) && valid;
+            }
+            
+            // 🔐 পিন ভ্যালিডেশন
+            if (C.enableStudentPin !== false) {
+                const pinInput = document.getElementById('studentPin');
+                if (pinInput && (pinInput.value.trim().length !== 4 || isNaN(pinInput.value.trim()))) {
+                    showFieldError(pinInput, 'অবশ্যই ৪-ডিজিটের সংখ্যাভিত্তিক পিন দিন (যেমন: 1234)');
+                    valid = false;
+                } else if (pinInput) {
+                    showFieldSuccess(pinInput);
+                }
+            }
+
+            valid = validateAge(document.getElementById('studentAge')) && valid;
+            
+            const studentClass = document.getElementById('studentClass');
+            if (studentClass.value.trim().length < 1) {
+                showFieldError(studentClass, 'শ্রেণী/ক্লাস দিন');
+                valid = false;
+            } else showFieldSuccess(studentClass);
+            
+            const batchSelect = document.getElementById('batchSelection');
+            if (!batchSelect.value) {
+                showFieldError(batchSelect, 'ব্যাচ নির্বাচন করুন');
+                valid = false;
+            } else showFieldSuccess(batchSelect);
+            
+            const isCash = document.getElementById('methodCash').checked;
+            if (isCash) {
+                const booth = document.getElementById('cashBoothSelect');
+                if (!booth.value) { showFieldError(booth, 'বুথ নির্বাচন করুন'); valid = false; }
+            } else {
+                valid = validateTrxID(document.getElementById('bkashTrx')) && valid;
+            }
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                Swal.fire('সতর্কতা', 'শর্তাবলী মেনে নিন', 'warning');
+                valid = false;
+            }
+            return valid;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['mobileNumber', 'guardianMobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('input', () => validateMobileNumber(el)); el.addEventListener('blur', () => validateMobileNumber(el)); }
+            });
+            ['applicantName', 'studentName'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', () => validateName(el));
+            });
+            const ageEl = document.getElementById('studentAge');
+            if (ageEl) { ageEl.addEventListener('input', () => validateAge(ageEl)); ageEl.addEventListener('blur', () => validateAge(ageEl)); }
+        });
+
+       // ============ REGISTRATION SUBMIT (ডুপ্লিকেট মোবাইল শতভাগ প্রতিরোধী) ============
+        document.getElementById('registrationForm').onsubmit = async function(e) {
+            e.preventDefault();
+            if (!validateRegistrationForm()) return;
+
+            const originalText = submitBtn.innerHTML;
+            const mobileInput = document.getElementById('mobileNumber').value.trim();
+            const cleanMobile = sanitizeMobile(mobileInput);
+            const guardianMobileInput = document.getElementById('guardianMobile').value.trim();
+            const cleanGuardianMobile = guardianMobileInput ? sanitizeMobile(guardianMobileInput) : '';
+
+            const isCash = document.getElementById('methodCash').checked;
+            const receiverName = document.getElementById('cashBoothSelect').value;
+            const trx = document.getElementById('bkashTrx').value.trim();
+            const pinValue = document.getElementById('studentPin')?.value.trim() || cleanMobile.slice(-4);
+
+            // বাটনে ডাবল-ক্লিক প্রতিরোধ
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> মোবাইল নম্বর যাচাই হচ্ছে...';
+            submitBtn.disabled = true;
+
+            try {
+                // 🛑 ১. একই সাথে শিক্ষার্থীর নিজের মোবাইল ও অভিভাবকের মোবাইলের মধ্যে সংঘাত চেক
+                if (cleanGuardianMobile && cleanMobile === cleanGuardianMobile) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'একই নম্বর প্রযোজ্য নয়',
+                        text: 'শিক্ষার্থী ও অভিভাবকের নম্বর একই হতে পারবে না।'
+                    });
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // 🛑 ২. ফায়ারস্টোরে ডুপ্লিকেট মোবাইল নম্বর চেক (Comprehensive Check)
+                // mobileNumber অথবা whatsappNumber হিসেবে পূর্বে রেজিস্টার্ড আছে কিনা
+                const [checkMobileSnap, checkWaSnap] = await Promise.all([
+                    getDocs(query(collection(db, "students"), where("mobileNumber", "==", cleanMobile))),
+                    getDocs(query(collection(db, "students"), where("whatsappNumber", "==", cleanMobile)))
+                ]);
+
+                // ডুপ্লিকেট পাওয়া গেলে তাৎক্ষণিক ব্লক
+                if (!checkMobileSnap.empty || !checkWaSnap.empty) {
+                    const existingDoc = (!checkMobileSnap.empty ? checkMobileSnap.docs[0] : checkWaSnap.docs[0]).data();
+                    const statusText = existingDoc.status === 'approved' ? 'অনুমোদিত' : 'অপেক্ষমান';
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'রেজিস্ট্রেশন ব্যর্থ!',
+                        html: `<b>(${cleanMobile})</b> এই মোবাইল নম্বর দিয়ে ইতিমধ্যে একজন শিক্ষার্থী নিবন্ধিত আছেন!<br><br>` +
+                              `<b>নাম:</b> ${existingDoc.studentName}<br>` +
+                              `<b>ব্যাচ:</b> ${existingDoc.batch}<br>` +
+                              `<b>অবস্থা:</b> <span class="badge ${existingDoc.status === 'approved' ? 'bg-success' : 'bg-warning text-dark'}">${statusText}</span><br><br>` +
+                              `<small class="text-muted">আপনার পিন ভুলে গেলে বা সমস্যা হলে কোচিং অফিসে যোগাযোগ করুন।</small>`
+                    });
+
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // 🛑 ৩. অভিভাবকের নম্বর দিয়ে কোনো শিক্ষার্থী ইতিমধ্যে নিজের মোবাইল হিসেবে ভর্তি হয়েছে কিনা চেক
+                if (cleanGuardianMobile) {
+                    const guardCheckSnap = await getDocs(query(collection(db, "students"), where("mobileNumber", "==", cleanGuardianMobile)));
+                    if (!guardCheckSnap.empty) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'অভিভাবকের নম্বর ইতিমধ্যে ব্যবহৃত',
+                            text: `প্রদত্ত অভিভাবকের মোবাইল নম্বরটি (${cleanGuardianMobile}) ইতিমধ্যে অন্য একজন শিক্ষার্থীর মূল নম্বর হিসেবে রেজিস্টার্ড।`
+                        });
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                }
+
+                submitBtn.innerHTML = '<i class="fas fa-user-lock fa-spin me-1"></i> একাউন্ট তৈরি হচ্ছে...';
+
+                // ভার্চুয়াল Auth ক্রেডেনশিয়াল
+                const virtualEmail = `${cleanMobile}@student.coaching`;
+                const virtualPassword = `pin_${pinValue}`;
+
+                // সেকেন্ডারি অ্যাপ দিয়ে Auth ইউজার তৈরি
+                const tempApp = initializeApp(firebaseConfig, "TempRegApp_" + Date.now());
+                const tempAuth = getAuth(tempApp);
+
+                let studentUid = null;
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(tempAuth, virtualEmail, virtualPassword);
+                    studentUid = userCredential.user.uid;
+                    await signOut(tempAuth);
+                } catch (authError) {
+                    // Firebase Auth-এ যদি আগে থেকেই এই ইমেইল থাকে (Hard-level duplicate check)
+                    if (authError.code === 'auth/email-already-in-use') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'নিবন্ধন সম্ভব নয়',
+                            text: 'এই মোবাইল নম্বর দিয়ে ইতিপূর্বে একাউন্ট তৈরি করা হয়েছে। স্টুডেন্ট পোর্টালে সরাসরি লগইন করুন।'
+                        });
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    } else {
+                        throw authError;
+                    }
+                } finally {
+                    try { await deleteApp(tempApp); } catch(e) {}
+                }
+
+                submitBtn.innerHTML = '<i class="fas fa-save fa-spin me-1"></i> তথ্য সংরক্ষণ হচ্ছে...';
+
+                const todayDate = new Date().toLocaleDateString('bn-BD');
+                const currentMonth = getCurrentMonthName();
+                const selectedPackage = document.querySelector('input[name="package"]:checked').value;
+
+                const formData = {
+                    applicantName: document.getElementById('applicantName').value.trim(),
+                    mobileNumber: cleanMobile,
+                    whatsappNumber: cleanMobile,
+                    guardianMobile: cleanGuardianMobile,
+                    studentName: document.getElementById('studentName').value.trim(),
+                    studentAge: document.getElementById('studentAge').value.trim(),
+                    studentGender: document.getElementById('studentGender').value,
+                    studentClass: document.getElementById('studentClass').value.trim(),
+                    address: document.getElementById('address').value.trim(),
+                    batch: document.getElementById('batchSelection').value,
+                    package: selectedPackage,
+                    pin: pinValue,
+                    authUid: studentUid,
+                    virtualEmail: virtualEmail,
+                    amount: currentPrice,
+                    paymentMethod: isCash ? 'Cash' : 'bKash',
+                    receivedBy: isCash ? receiverName : 'Online System',
+                    transactionId: isCash ? 'CASH_PAYMENT' : trx,
+                    admissionDate: todayDate,
+                    admissionMonth: currentMonth,
+                    timestamp: serverTimestamp(),
+                    status: 'pending'
+                };
+
+                const receiptNo = 'RCPT-' + studentUid.substring(0, 6).toUpperCase();
+
+                // ৪. অ্যাটমিক ব্যাচ রাইট (Atomic Batch Write)
+                const batchOp = writeBatch(db);
+                
+                // Student Doc (ID = studentUid)
+                batchOp.set(doc(db, "students", studentUid), formData);
+
+                // Payment Doc
+                batchOp.set(doc(collection(db, "payments")), {
+                    ...formData,
+                    receiptNo,
+                    studentDocId: studentUid,
+                    paymentType: 'Admission Fee'
+                });
+
+                // Fee Doc
+                batchOp.set(doc(collection(db, "fees")), {
+                    mobile: cleanMobile,
+                    month: currentMonth,
+                    amount: formData.amount,
+                    trxId: formData.transactionId,
+                    date: todayDate,
+                    studentDocId: studentUid,
+                    studentName: formData.studentName,
+                    type: 'Admission', 
+                    paymentMethod: formData.paymentMethod,
+                    receivedBy: formData.receivedBy,
+                    timestamp: serverTimestamp(),
+                    status: 'pending'
+                });
+
+                await batchOp.commit();
+
+                Swal.fire({ 
+                    title: 'আবেদন সফল!', 
+                    html: `আপনার আবেদনটি সফলভাবে জমা হয়েছে।<br><b>মোবাইল:</b> ${cleanMobile}<br><b>লগইন পিন:</b> <span class="badge bg-warning text-dark font-monospace">${pinValue}</span><br><br><small class="text-muted">অ্যাডমিন অনুমোদন সম্পন্ন করলে এই মোবাইল ও পিন দিয়ে স্টুডেন্ট পোর্টালে ঢুকতে পারবেন।</small>`, 
+                    icon: 'success', 
+                    confirmButtonColor: '#1e3a8a' 
+                }).then(() => {
+                    document.getElementById('registrationForm').reset();
+                    submitBtn.innerHTML = 'আবেদন জমা দিন <i class="fas fa-paper-plane ms-2"></i>';
+                    submitBtn.disabled = false;
+                    submitBtn.classList.replace('btn-primary', 'btn-secondary');
+                    window.showSection('home');
+                });
+
+            } catch (error) {
+                console.error("Registration Error:", error);
+                Swal.fire('ত্রুটি', error.message || 'নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন।', 'error');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        };
+
+        // ============ FEE SUBMIT ============
+        document.getElementById('feeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!verifiedStudentId) { Swal.fire('সতর্কতা', 'মোবাইল যাচাই করুন।', 'warning'); return; }
+
+            const isCash = document.getElementById('feeMethodCash').checked;
+            const receiverName = document.getElementById('feeBoothSelect').value; 
+            const trx = document.getElementById('feeTrx').value.trim();
+
+            const btn = document.getElementById('feeSubmitBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'অপেক্ষা করুন...';
+            btn.disabled = true;
+
+            const mobile = sanitizeMobile(document.getElementById('feeMobile').value);
+            const month = document.getElementById('feeMonth').value;
+            const amount = Number(document.getElementById('feeAmount').value);
+            const stdName = document.getElementById('studentFoundMsg').innerText.split('(')[0].replace('✓', '').trim().replace(/[^\w\s\u0980-\u09FF]/g, '');
+            const todayDate = new Date().toLocaleDateString('bn-BD');
+            const finalTrx = isCash ? 'CASH_PAYMENT' : trx;
+
+            const feeData = {
+                mobile, month, amount,
+                studentDocId: verifiedStudentId,
+                studentName: stdName, 
+                paymentMethod: isCash ? 'Cash' : 'bKash',
+                receivedBy: isCash ? receiverName : 'Online System',
+                trxId: finalTrx, date: todayDate,
+                timestamp: serverTimestamp(), status: 'pending'
+            };
+
+            addDoc(collection(db, "fees"), feeData)
+            .then(() => {
+                Swal.fire({
+                    title: 'ফি জমা হয়েছে!',
+                    text: 'অ্যাডমিন যাচাই করার পর আপনার ফি পরিশোধিত হিসেবে গণ্য হবে।',
+                    icon: 'success',
+                    confirmButtonColor: '#1e3a8a'
+                }).then(() => {
+                    document.getElementById('feeForm').reset();
+                    document.getElementById('studentFoundMsg').style.display = 'none';
+                    document.getElementById('courseDurationBox').style.display = 'none';
+                    verifiedStudentId = null;
+                    window.showSection('home');
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                Swal.fire('ত্রুটি', 'আবার চেষ্টা করুন।', 'error');
+            })
+            .finally(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+        });
+
+        // ============ ADMISSION PROGRESS ============
+        async function loadAdmissionProgress() {
+            try {
+                const sq = query(collection(db, "students"), where("status", "==", "approved"));
+                const snap = await getDocs(sq);
+                let enrolled = snap.size;
+
+                const bq = query(collection(db, "batches"));
+                const bs = await getDocs(bq);
+                let seats = 0, activeBatches = 0;
+                bs.forEach(d => {
+                    const b = d.data();
+                    if (b.seatLimit) seats += parseInt(b.seatLimit);
+                    activeBatches++;
+                });
+                if (seats === 0) seats = C.defaultSeatLimit || 100;
+
+                const avail = Math.max(seats - enrolled, 0);
+                const pct = Math.min((enrolled / seats) * 100, 100);
+
+                document.getElementById('totalEnrolledCount').innerText = toBengaliNum(enrolled);
+                document.getElementById('totalSeatsCount').innerText = toBengaliNum(seats);
+                document.getElementById('availableSeatsCount').innerText = toBengaliNum(avail);
+                document.getElementById('batchesCount').innerText = toBengaliNum(activeBatches);
+                
+                const pf = document.getElementById('totalProgressFill');
+                if (pf) pf.style.width = pct + '%';
+            } catch (e) {
+                console.error("Progress error:", e);
+            }
+        }
+
+        window.addEventListener('load', function() {
+            loadAdmissionProgress();
+            setInterval(loadAdmissionProgress, 30000);
+        });
+
+        // ============ 📢 নোটিশ বার লোড ============
+        onSnapshot(collection(db, "notices"), snap => {
+            const ticker = document.getElementById('noticeTickerContainer');
+            const tickerText = document.getElementById('noticeTickerText');
+            if (!ticker || !tickerText) return;
+
+            const publicNotices = snap.docs
+                .map(d => d.data())
+                .filter(n => n.target === 'all')
+                .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+                .slice(0, 5);
+
+            if (publicNotices.length === 0) { 
+                ticker.style.display = 'none'; 
+                return; 
+            }
+            
+            ticker.style.display = 'block';
+            tickerText.innerHTML = publicNotices.map(n => `📢 ${n.title} (${n.date}) &nbsp;&nbsp;&nbsp;&nbsp;`).join(' | ');
+        }, (err) => {
+            console.error("Notice Ticker Error:", err);
+        });
+   </script>
+</body>
+</html>
